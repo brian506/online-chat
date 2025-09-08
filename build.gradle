@@ -13,13 +13,13 @@ jar {
 	enabled = true
 }
 
-sonar {
+sonarqube {
 	properties {
-		property "sonar.projectKey", "brian506_online-chat"
-		property "sonar.organization", "brian506"
+		property "sonar.projectKey", "brian506_online-chat" // 1. SonarCloud 프로젝트 키
+		property "sonar.organization", "brian506"           // 2. SonarCloud 조직 키
+		property "sonar.host.url", "https://sonarcloud.io"
 	}
 }
-
 
 allprojects {
 	group = 'com.example'
