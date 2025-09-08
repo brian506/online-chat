@@ -50,9 +50,17 @@ logging:
     org.springframework.security: DEBUG
 
 redis:
-  host: localhost
-  port: 6379
-  password: wind6298
+  refresh-token:
+    host: localhost
+    port: 6381
+    password: ${REDIS_PASSWORD}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 jwt:
   secretKey: ${JWT_KEY}

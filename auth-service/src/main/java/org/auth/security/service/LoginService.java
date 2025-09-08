@@ -9,6 +9,7 @@ import org.auth.domain.repository.TokenRepository;
 import org.auth.domain.repository.UserRepository;
 import org.auth.security.dto.response.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -23,6 +24,7 @@ public class LoginService {
     private final TokenRepository tokenRepository;
 
 
+    @Transactional
     public LoginResponse login(final String code) {
 
         GoogleTokenResponse tokenResponse = googleService.getAccessToken(code);
@@ -35,10 +37,12 @@ public class LoginService {
 
         String accessToken = jwtService.createAccessToken(new AccessTokenPayload(user.getEmail(), Role.GENERAL, new Date()));
         String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(user.getEmail(), new Date()));
+        user.setAccessToken(accessToken);
 
         // refreshToken 레디스에 저장
         Token token = new Token(user.getEmail(),refreshToken,Role.GENERAL);
         tokenRepository.save(token);
+
         log.info("저장된 리프레시토큰 : " + token.getRefreshToken());
 
         return new LoginResponse(Role.GENERAL, accessToken, refreshToken);

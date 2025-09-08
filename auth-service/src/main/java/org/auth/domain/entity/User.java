@@ -29,6 +29,11 @@ public class User extends BaseTime {
 
     @Enumerated(EnumType.STRING)
     @Setter
+    @Column(name = "user_role",nullable = false)
     private Role role;
+
+    @Setter
+    @Column(name = "access_token", nullable = true)
+    private String accessToken;
 }
 
