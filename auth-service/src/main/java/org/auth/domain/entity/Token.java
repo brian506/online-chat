@@ -6,7 +6,6 @@ import lombok.ToString;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.TimeToLive;
 
 @RedisHash(value = "refresh_token",timeToLive = 604800) // 7일
 @AllArgsConstructor

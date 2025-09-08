@@ -1,20 +1,18 @@
 
 springBoot {
-    mainClass = 'org.chat.ChatApplication'
+    mainClass = 'org.eureka.EurekaApplication'
 }
 
-
-
-dependencies {
-    implementation project(':common')
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
-// 게이트웨이 클라우드 버전 명시
 ext {
     set('springCloudVersion', "2025.0.0")
+}
+
+dependencies {
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
 }
 dependencyManagement {
     imports {
