@@ -34,7 +34,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # SonarQube API 토큰
         run: |
           ./gradlew sonarqube \
-            -Dsonar.projectKey=online-chat \
+            -Dsonar.projectKey=brian506_online-chat \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.pullrequest.key=${{ github.event.number }} \
