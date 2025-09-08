@@ -1,42 +1,36 @@
-name: SonarQube Analysis
+name: SonarQube
 on:
-  pull_request: # PR이 생성되거나 업데이트될 때마다 워크플로우를 실행합니다.
+  push:
     branches:
-      - main # main 브랜치를 대상으로 하는 PR에 대해 실행
-
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
-  analyze:
+  build:
+    name: Build and analyze
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          # SonarQube가 코드의 전체 히스토리를 분석할 수 있도록 fetch-depth를 0으로 설정합니다.
-          fetch-depth: 0
-
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
-
+          java-version: 21
+          distribution: 'zulu' # Alternative distribution options are available
       - name: Cache SonarQube packages
-        id: cache-sonar
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-
-      - name: Analyze with SonarQube
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Build and analyze
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub 토큰 (PR 댓글 작성 권한)
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # SonarQube API 토큰
-        run: |
-          ./gradlew sonarqube \
-            -Dsonar.projectKey=brian506_online-chat \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.pullrequest.key=${{ github.event.number }} \
-            -Dsonar.pullrequest.branch=${{ github.head_ref }} \
-            -Dsonar.pullrequest.base=${{ github.base_ref }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew build sonar --info
