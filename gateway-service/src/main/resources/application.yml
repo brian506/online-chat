@@ -9,7 +9,7 @@ spring:
   cloud:
     gateway:
       default-filters:
-        - name: AuthenticationFilter # 모든 라우터에 기본적으로 적용될 필터
+        - AuthenticationFilter # 모든 라우터에 기본적으로 적용될 필터
       routes:
         - id: auth-service # 라우터 고유ID
           uri: lb://auth-service # 최종 목적지 주소
