@@ -1,10 +1,12 @@
-package org.gateway.filter;
+package org.gateway.authentication;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -19,21 +21,20 @@ import reactor.core.publisher.Mono;
  * 클라이언트의 요청이 서비스에 전달되기 전에 실행( 로그인 성공 이후, API 접근할 때)
  * 인증/인가 처리 적합 -> 엑세스 헤더 추출하여 검증
  */
+// todo 예외처리 생성
 @Component
 @Slf4j
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
-    private final Environment env;
+    private final JwtUtil jwtUtil;
     private final String LOGIN_URL = "/oauth2/callback/google/login";
 
-    public AuthenticationFilter(Environment env) {
+    public AuthenticationFilter(JwtUtil jwtUtil) {
         super(Config.class);
-        this.env = env;
+        this.jwtUtil = jwtUtil;
     }
 
-    public static class Config {
-
-    }
+    public static class Config {}
 
     // 로그인 -> jwt 반환 -> 사용자는 요청 시마다 jwt 헤더에 담아 전송
     @Override
@@ -53,11 +54,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             }
 
             String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
-            String jwt = authorizationHeader.replace("Bearer ", "");
+            String token = authorizationHeader.replace("Bearer ", "");
 
             //  토큰 유효성 검증
-            if (!isJwtValid(jwt)) {
-                return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
+            try{
+                jwtUtil.validateToken(token);
+            } catch (Exception e){
+                throw new RuntimeException(e);
             }
 
             //  유효한 경우 다음 필터로 요청 전달
@@ -65,25 +68,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         };
     }
 
-    // JWT 유효성 검증 로직
-    private boolean isJwtValid(String jwt) {
-        boolean returnValue = true;
-        String subject = null;
 
-        try {
-            subject = Jwts.parser().setSigningKey(env.getProperty("jwt.secret"))
-                    .parseClaimsJws(jwt).getBody()
-                    .getSubject();
-        } catch (Exception ex) {
-            returnValue = false;
-        }
-
-        if (subject == null || subject.isEmpty()) {
-            returnValue = false;
-        }
-
-        return returnValue;
-    }
 
     // 에러 발생 시 Mono<Void> 타입의 객체를 반환
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
