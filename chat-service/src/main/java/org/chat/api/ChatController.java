@@ -14,6 +14,6 @@ public class ChatController {
 
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(Message message){
-        chatService
+        chatService.sendMessage(message);
     }
 }
