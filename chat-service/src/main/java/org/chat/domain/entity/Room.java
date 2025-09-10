@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Builder
 @Document(collection = "rooms")
-public class Room extends BaseTime {
+public class Room  {
 
     @Id
     private String id;

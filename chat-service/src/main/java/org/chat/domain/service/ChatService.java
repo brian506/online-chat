@@ -20,7 +20,7 @@ public class ChatService {
 
        messageRepository.save(messageToSave)
                .doOnSuccess(savedMessage -> {
-                   // 브로드캐스팅
+                   // 브로드캐스팅 ( 클라이언트들이 메시지를 받기 위해 구독하는 주소 )
                    String destination = "/sub/chat/room/" + savedMessage.getRoomId();
                    messagingTemplate.convertAndSend(destination,savedMessage);
                })
