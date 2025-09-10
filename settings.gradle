@@ -6,4 +6,4 @@ include 'presence-service'
 include 'gateway-service'
 include 'common'
 include 'eureka-server'
-include 'config-server'
+
