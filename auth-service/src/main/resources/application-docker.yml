@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # 개발 환경에서는 update, 운영 환경에서는 validate 또는 none을 권장합니다.
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+redis:
+  refresh-token:
+    host: refresh-token-redis # 'localhost' -> 'refresh-token-redis'
+    port: 6379              # Docker 내부 포트 6379 사용
+    password: ${REDIS_PASSWORD}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
+jwt:
+  secretKey: ${JWT_KEY}
+
+google:
+  client_id: ${GOOGLE_CLIENT_ID}
+  client_secret: ${GOOGLE_CLIENT_SECRET}
+  redirect_uri: http://localhost:19091/oauth2/callback/google/login
