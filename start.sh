@@ -1,36 +1,20 @@
-#!/bin/bash
-
-AUTH_MODULE_DIR="./auth-service"
-EUREKA_MODULE_DIR="./eureka-server"
-GATEWAY_MODULE_DIR="./gateway-service"
-
-echo "Building the jar with Gradle..."
-./gradlew -p "$EUREKA_MODULE_DIR" clean build -x test || {
+echo "Building all modules with Gradle..."
+./gradlew clean build -x test || {
   echo "Gradle build failed!"
   exit 1
 }
 
-echo "Building the jar with Gradle..."
-./gradlew -p "$GATEWAY_MODULE_DIR" clean build -x test || {
-  echo "Gradle build failed!"
-  exit 1
-}
-
-echo "Building the jar with Gradle..."
-./gradlew -p "$AUTH_MODULE_DIR" clean build -x test || {
-  echo "Gradle build failed!"
-  exit 1
-}
-
+# docker-compose.yml 파일명을 명시적으로 지정
+DOCKER_COMPOSE_FILE="docker-compose-local.yml"
 
 echo "Building Docker images..."
-docker compose -f docker-compose-local.yml build --no-cache || {
+docker compose -f "$DOCKER_COMPOSE_FILE" build --no-cache || {
   echo "Docker build failed!"
   exit 1
 }
 
 echo "Starting containers..."
-docker compose -f docker-compose-local.yml up -d || {
+docker compose -f "$DOCKER_COMPOSE_FILE" up -d || {
   echo "Docker compose up failed!"
   exit 1
 }

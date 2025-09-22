@@ -1,4 +1,4 @@
-package org.auth.domain.repository;
+package org.auth.domain.repository.redis;
 
 import org.auth.domain.entity.Token;
 import org.springframework.data.repository.CrudRepository;

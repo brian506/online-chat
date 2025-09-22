@@ -7,41 +7,45 @@ spring:
   application:
     name: gateway-service
   cloud:
+    # 👇 gateway 설정은 모두 이 아래에 일관되게 위치해야 합니다.
     gateway:
       default-filters:
-        - AuthenticationFilter # 모든 라우터에 기본적으로 적용될 필터
-      routes:
-        - id: auth-service # 라우터 고유ID
-          uri: lb://auth-service # 최종 목적지 주소
-          predicates:
-            - Path=/auth/** # 라우트 적용 조건
-          filters:
-            - RewritePath=/v1/api/(?<segment>.*), /${segment} # 경로 재작성(실제로 클라이언트는 /v1/api ~ 까지 포함해서 요청을 보내지만 게이트웨이가 /v1/api 을 짜르고 이후의 경로로 요청보냄) 컨트롤러에서는 /v1/api 작성X
+        - AuthenticationFilter
+      server:
+        webflux:
+          # 👇 라우팅 관련 설정은 모두 여기로 이동
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/oauth2/**
+            - id: chat-service
+              uri: lb:ws://chat-service
+              predicates:
+                - Path=/chat/**
+          # 👇 discovery locator의 새 위치
+          discovery:
+            locator:
+              enabled: true
+    # 👇 loadbalancer는 cloud 레벨에 위치
+    loadbalancer:
+      cache:
+        enabled: false
 
-        - id: chat-service
-          uri: lb://chat-service
-          predicates:
-            - Path=/chat/**
-          filters:
-            - RewritePath=/v1/api/(?<segment>.*), /${segment}
-
-        - id: presence-service
-          uri: lb://presence-service
-          predicates:
-            - Path=/presence/**
-          filters:
-            - RewritePath=/v1/api/(?<segment>.*), /${segment}
-      discovery:
-        locator:
-          enabled: true
-
-
+# Eureka 클라이언트 설정
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_URL}
 
+# JWT 관련 커스텀 설정
 jwt:
   secretKey: ${JWT_KEY}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.netty: DEBUG

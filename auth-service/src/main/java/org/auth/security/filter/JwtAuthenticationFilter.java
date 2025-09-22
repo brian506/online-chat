@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.auth.domain.entity.Role;
 import org.auth.domain.entity.Token;
-import org.auth.domain.repository.TokenRepository;
-import org.auth.domain.repository.UserRepository;
+import org.auth.domain.repository.redis.TokenRepository;
 import org.auth.security.dto.response.AccessTokenPayload;
 import org.auth.security.service.CookieService;
 import org.auth.security.service.JwtService;
@@ -43,7 +42,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
+        log.info("Incoming request URI: {}", request.getRequestURI());
+
+        if (request.getRequestURI().startsWith(NO_CHECK_URL)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,7 +57,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = accessTokenOpt.get();
 
         try {
-            jwtService.verifyToken(accessToken);
             setAuthentication(accessToken);
             filterChain.doFilter(request, response);
 

@@ -1,4 +1,4 @@
-package org.gateway.authentication;
+package org.gateway.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -14,8 +14,11 @@ public class JwtUtil {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    public void validateToken(final String token){
-        Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
+    public void validateToken(final String token) {
+        Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token);
     }
 
     private Key getSignKey() {

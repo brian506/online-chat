@@ -1,10 +1,9 @@
-package org.gateway.authentication;
+package org.gateway.security;
 
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+
+import org.common.exception.custom.JwtValidationException;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -20,6 +20,8 @@ import reactor.core.publisher.Mono;
  * Global Filter
  * 클라이언트의 요청이 서비스에 전달되기 전에 실행( 로그인 성공 이후, API 접근할 때)
  * 인증/인가 처리 적합 -> 엑세스 헤더 추출하여 검증
+ * 사용자의 Claim 은 추출하지 않고 토큰의 유효성만 검증한다.
+ *  SecurityWebFilterChain의 검사를 통과한 후, 실제 마이크로서비스로 라우팅되기 직전에 실행
  */
 // todo 예외처리 생성
 @Component
@@ -44,28 +46,35 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
             // login 경로는 다음 필터로 넘어감
             String path = request.getURI().getPath();
-            if (path.equals(LOGIN_URL)) {
+            if (path.startsWith(LOGIN_URL)) {
+                log.info(">>> Gateway AuthenticationFilter 진입: {}", path);
                 return chain.filter(exchange);
             }
 
             // 헤더 존재 여부 확인
-            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
+            String token = resolveToken(request);
+            if (token == null) {
+                return onError(exchange, "Token is missing", HttpStatus.UNAUTHORIZED);
             }
-
-            String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
-            String token = authorizationHeader.replace("Bearer ", "");
 
             //  토큰 유효성 검증
             try{
                 jwtUtil.validateToken(token);
-            } catch (Exception e){
-                throw new RuntimeException(e);
+                log.info("토큰 유효성 검증 : " + token);
+            } catch (ExpiredJwtException e){
+                throw new JwtValidationException("유효하지 않은 토큰입니다");
             }
 
             //  유효한 경우 다음 필터로 요청 전달
             return chain.filter(exchange);
         };
+    }
+    private String resolveToken(ServerHttpRequest request) {
+        String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 
 

@@ -1,16 +1,17 @@
 bootJar {
-    enabled = false
+    enabled = false // 실제 실행할 모듈이 아니므로 false
 }
 jar {
-    enabled = true
+    enabled = true // 다른 서비스들의 의존성을 가질때 true
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework:spring-web'
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
 }
 
 

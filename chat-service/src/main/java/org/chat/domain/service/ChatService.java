@@ -15,13 +15,15 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void sendMessage(Message message){
+    public void sendMessage(final Message message){
+        // 1. 메시지 객체 생성
        Message messageToSave = Message.saveMessage(message);
 
+       // 2. 메시지 저장하고 클라이언트들에게 브로드캐스팅
        messageRepository.save(messageToSave)
                .doOnSuccess(savedMessage -> {
                    // 브로드캐스팅 ( 클라이언트들이 메시지를 받기 위해 구독하는 주소 )
-                   String destination = "/sub/chat/room/" + savedMessage.getRoomId();
+                   String destination = "/topic/chat/room/" + savedMessage.getRoomId();
                    messagingTemplate.convertAndSend(destination,savedMessage);
                })
                .subscribe();
