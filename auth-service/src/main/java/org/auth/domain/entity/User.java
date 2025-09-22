@@ -4,7 +4,7 @@ package org.auth.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import org.common.config.BaseTime;
+import org.auth.config.BaseTime;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 

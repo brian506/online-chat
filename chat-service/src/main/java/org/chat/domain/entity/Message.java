@@ -4,7 +4,6 @@ package org.chat.domain.entity;
 import lombok.Builder;
 import lombok.Getter;
 import org.chat.domain.dto.Sender;
-import org.common.config.BaseTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;

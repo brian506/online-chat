@@ -12,6 +12,8 @@ public class ChatController {
 
     private final ChatService chatService;
 
+    // = /app/sendMessage
+    // publish / send : 발행 역할
     @MessageMapping("/sendMessage") // 서버에서 메시지 수신
     public void sendMessage(Message message){
         chatService.sendMessage(message);

@@ -2,7 +2,7 @@ rootProject.name = 'security_msa'
 
 include 'auth-service'
 include 'chat-service'
-include 'presence-service'
+
 include 'gateway-service'
 include 'common'
 include 'eureka-server'

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.auth.domain.entity.Role;
 import org.auth.domain.entity.Token;
 import org.auth.domain.entity.User;
-import org.auth.domain.repository.TokenRepository;
+import org.auth.domain.repository.redis.TokenRepository;
 import org.auth.domain.repository.UserRepository;
 import org.auth.security.dto.response.*;
 import org.springframework.stereotype.Service;

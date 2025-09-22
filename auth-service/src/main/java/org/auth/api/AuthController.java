@@ -1,6 +1,7 @@
 package org.auth.api;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.auth.security.dto.response.LoginResponse;
 import org.auth.security.service.CookieService;
 import org.auth.security.service.LoginService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth2/callback/google")
@@ -24,6 +26,7 @@ public class AuthController {
     @GetMapping("/login")
     public ResponseEntity<?> login(@RequestParam final String code){
         LoginResponse loginResponse = loginService.login(code);
+        log.info("======> AuthController received request. Code: {}", code);
         String refreshTokenCookie = cookieService.createRefreshTokenCookie(loginResponse.refreshToken());
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION,loginResponse.accessToken())
