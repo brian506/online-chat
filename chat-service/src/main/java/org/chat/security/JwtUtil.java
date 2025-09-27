@@ -46,8 +46,11 @@ public class JwtUtil {
         Claims claims = parseClaims(accessToken);
         String email = claims.getSubject();
         String role = claims.get("role", String.class);
+        String username = claims.get("username",String.class);
+
+        StompPrincipal principal = new StompPrincipal(username,email); // username 먼저해야 Principal 객체 안에서 username 이 나옴
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
-        return new UsernamePasswordAuthenticationToken(email,null,List.of(grantedAuthority));
+        return new UsernamePasswordAuthenticationToken(principal,null,List.of(grantedAuthority));
     }
     // 토큰 안에 있는 사용자 이름만 반환하기 위한 메소드
     public String getUsernameFromToken(final String accessToken) {

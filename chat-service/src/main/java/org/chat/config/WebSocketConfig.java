@@ -2,6 +2,7 @@ package org.chat.config;
 
 import lombok.RequiredArgsConstructor;
 import org.chat.handler.StompHandler;
+import org.chat.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -14,6 +15,7 @@ import org.springframework.web.socket.config.annotation.*;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
+    private final JwtUtil jwtUtil;
 
     @Value("${domain.websocket.chat}")
     private String chatUrl; // /game

@@ -14,10 +14,11 @@ public class StompPrincipal implements Principal {
      * accessor.setUser() 안에는 principal 객체가 들어가야돼서
      */
     private final String username;
+    private final String email;
 
     @Override
     public String getName() {
-        return username; // 화면에 쓸 때는 username
+        return username;
     }
-
 }
+
