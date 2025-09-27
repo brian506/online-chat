@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import org.auth.config.BaseTime;
+import org.auth.security.dto.response.GoogleUserResponse;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
@@ -35,5 +36,13 @@ public class User extends BaseTime {
     @Setter
     @Column(name = "access_token", nullable = true)
     private String accessToken;
+
+    public static User saveUser(GoogleUserResponse response){
+        return User.builder()
+                .email(response.email())
+                .role(Role.GENERAL)
+                .name(response.name())
+                .build();
+    }
 }
 

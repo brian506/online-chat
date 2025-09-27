@@ -1,21 +1,30 @@
 package org.chat.api;
 
 import lombok.RequiredArgsConstructor;
-import org.chat.domain.entity.Message;
+import lombok.extern.slf4j.Slf4j;
+import org.chat.domain.dto.request.CreateRoomRequest;
+import org.chat.domain.entity.Room;
 import org.chat.domain.service.ChatService;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.stereotype.Controller;
+import org.common.utils.SuccessResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@Slf4j
+@RequestMapping("/chat")
 public class ChatController {
 
     private final ChatService chatService;
 
-    // = /app/sendMessage
-    // publish / send : 발행 역할
-    @MessageMapping("/sendMessage") // 서버에서 메시지 수신
-    public void sendMessage(Message message){
-        chatService.sendMessage(message);
+    @PostMapping("/rooms")
+    public ResponseEntity<?> createRoom(@RequestBody CreateRoomRequest request){
+        Room room = chatService.createRoom(request);
+        SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",room);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

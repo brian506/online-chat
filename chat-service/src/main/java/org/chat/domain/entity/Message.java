@@ -20,7 +20,7 @@ public class Message  {
     private String id;
 
     @Field(name = "room_id")
-    private Long roomId;
+    private String roomId;
 
     @Field(name = "content")
     private String content;

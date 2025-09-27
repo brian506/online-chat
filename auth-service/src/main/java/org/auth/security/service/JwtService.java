@@ -51,6 +51,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(payload.email())
                 .claim("role", payload.role().getKey())
+                .claim("username",payload.username())
                 .setIssuer(issuer)
                 .setIssuedAt(payload.date())
                 .setExpiration(new Date(payload.date().getTime() + accessKeyExpiration * 1000L))

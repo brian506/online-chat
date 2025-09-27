@@ -7,32 +7,40 @@ spring:
   application:
     name: gateway-service
   cloud:
-    # 👇 gateway 설정은 모두 이 아래에 일관되게 위치해야 합니다.
     gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - http://127.0.0.1:5500
+            allowedMethods: [ GET, POST, OPTIONS ]
+            allowedHeaders: [ Authorization, Content-Type ]
+            allowCredentials: true
+            maxAge: 3600
+        default-filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
       default-filters:
         - AuthenticationFilter
       server:
         webflux:
-          # 👇 라우팅 관련 설정은 모두 여기로 이동
+          # 라우팅 관련 설정은 모두 여기로 이동
           routes:
             - id: auth-service
               uri: lb://auth-service
               predicates:
                 - Path=/oauth2/**
             - id: chat-service
-              uri: lb:ws://chat-service
+              uri: lb:http://chat-service # "ws:" 까지 커버됨
               predicates:
                 - Path=/chat/**
-          # 👇 discovery locator의 새 위치
           discovery:
             locator:
               enabled: true
-    # 👇 loadbalancer는 cloud 레벨에 위치
     loadbalancer:
       cache:
         enabled: false
 
-# Eureka 클라이언트 설정
 eureka:
   client:
     register-with-eureka: true
@@ -40,7 +48,7 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_URL}
 
-# JWT 관련 커스텀 설정
+
 jwt:
   secretKey: ${JWT_KEY}
 
