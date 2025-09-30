@@ -2,6 +2,7 @@ package org.chat.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.chat.domain.dto.request.CreateRoomRequest;
 import org.chat.domain.dto.Participants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -26,4 +27,13 @@ public class Room  {
 
     @Field(name = "created_at")
     private LocalDateTime createdAt;
+
+    public static Room toEntity(CreateRoomRequest request) {
+        return Room.builder()
+                .name(request.name())
+                .participants(request.participants())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
 }

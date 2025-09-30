@@ -30,6 +30,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     private final JwtUtil jwtUtil;
     private final String LOGIN_URL = "/oauth2/callback/google/login";
+    private final String WEBSOCKET_URL = "/chat";
 
     public AuthenticationFilter(JwtUtil jwtUtil) {
         super(Config.class);
@@ -47,7 +48,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             // login 경로는 다음 필터로 넘어감
             String path = request.getURI().getPath();
             if (path.startsWith(LOGIN_URL)) {
-                log.info(">>> Gateway AuthenticationFilter 진입: {}", path);
+                log.info(">>> Gateway AuthenticationFilter 로그인 요청 : {}", path);
                 return chain.filter(exchange);
             }
 
@@ -55,6 +56,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             String token = resolveToken(request);
             if (token == null) {
                 return onError(exchange, "Token is missing", HttpStatus.UNAUTHORIZED);
+            }
+
+            // 웹소켓 연결은 인증 헤더만 체크 후  다음 필터로 넘어감
+            if(path.startsWith(WEBSOCKET_URL)){
+                log.info(">>> Gateway AuthenticationFilter 웹소켓 연결: {}", path);
+                return chain.filter(exchange);
             }
 
             //  토큰 유효성 검증

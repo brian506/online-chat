@@ -1,149 +1,92 @@
 version: "3.9"
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: auth-mysql
-    restart: always
-    ports:
-      - "3309:3306"
-    environment:
-      MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-    networks:
-      - eureka-network
-    volumes:
-      - mysql-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD-SHELL", "mysql -u root -p$$MYSQL_ROOT_PASSWORD -e 'select 1'"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-  refresh-token-redis:
-    image: redis:7.0.11
-    container_name: refresh-token-redis
-    ports:
-      - "6381:6379"
-    networks:
-      - eureka-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  mongodb:
-    image: mongo:latest
-    container_name: mongo-db
-    ports:
-      - "27017:27017"
-    networks:
-      - eureka-network
-    volumes:
-      - mongo-data:/data/db
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
   eureka-server:
-    build: ./eureka-server
+    image: brian506/eureka-server:1.0.3
     container_name: eureka-server
+    env_file:
+      - [ .env.prod ]
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-    ports:
-      - "8761:8761"
-    networks:
-      - eureka-network
-    volumes:
-      - ./wait-for-it.sh:/wait-for-it.sh # wait-for-it.sh 파일 마운트
+      SPRING_PROFILES_ACTIVE: prod
+      TZ: Asia/Seoul
+    expose:
+      - "8761"                         # 내부 통신만
+    networks: [ app-net ]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"] # 👈 health 엔드포인트 사용
+      test: ["CMD", "curl", "-fsS", "http://localhost:8761/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 60s
-    command: ["java", "-jar", "app.jar"]
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   gateway-server:
-    build: ./gateway-service
+    image: brian506/gateway-server:1.0.3
     container_name: gateway-server
-    ports:
-      - "19091:19091"
-    env_file:
-      - .env
+    env_file: [ .env.prod ]                 # 서버(EC2)에만 존재
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      TZ: Asia/Seoul
     depends_on:
       eureka-server:
         condition: service_healthy
-    networks:
-      - eureka-network
-    volumes:
-      - ./wait-for-it.sh:/wait-for-it.sh
-    command: ["/wait-for-it.sh", "eureka-server:8761", "-t", "0", "--", "java", "-jar", "app.jar"] # 👈 스크립트 사용
+    ports:
+      - "80:19091"                     # 외부 노출은 게이트웨이만
+    networks: [ app-net ]
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   auth-service:
-    build: ./auth-service
+    image: brian506/auth-service:1.0.3
     container_name: auth-service
+    env_file: [ .env.prod ]                 # DB/REDIS 엔드포인트는 .env로 주입 (RDS/ElastiCache)
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-    env_file:
-      - .env
-    ports:
-      - "8080:8080"
-    restart: always
+      SPRING_PROFILES_ACTIVE: prod
+      TZ: Asia/Seoul
     depends_on:
-      mysql:
-        condition: service_healthy
-      refresh-token-redis:
-        condition: service_healthy
       eureka-server:
         condition: service_healthy
-    networks:
-      - eureka-network
-    volumes:
-      - ./wait-for-it.sh:/wait-for-it.sh
-    command: [
-      "/wait-for-it.sh", "mysql:3306", "-t", "0", "--",
-      "/wait-for-it.sh", "refresh-token-redis:6379", "-t", "0", "--",
-      "/wait-for-it.sh", "eureka-server:8761", "-t", "0", "--",
-      "java", "-jar", "app.jar"
-    ] # 👈 모든 의존성 포트가 열릴 때까지 대기
+    expose:
+      - "8080"                          # 내부 통신만
+    networks: [ app-net ]
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: ["java", "-jar", "app.jar"]  # wait-for-it 제거
 
   chat-service:
-    build: ./chat-service
+    image: brian506/chat-service:1.0.3
     container_name: chat-service
+    env_file: [ .env.prod ]                 # MONGODB_URI는 Atlas/클러스터 주소로
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-    env_file:
-      - .env
-    ports:
-      - "8081:8080"
-    restart: always
+      SPRING_PROFILES_ACTIVE: prod
+      TZ: Asia/Seoul
     depends_on:
       eureka-server:
         condition: service_healthy
-      mongodb:
-        condition: service_healthy
-    networks:
-      - eureka-network
-    volumes:
-      - ./wait-for-it.sh:/wait-for-it.sh
-    command: [
-      "/wait-for-it.sh", "mongodb:27017", "-t", "0", "--",
-      "/wait-for-it.sh", "eureka-server:8761", "-t", "0", "--",
-      "java", "-jar", "app.jar"
-    ] # 👈 모든 의존성 포트가 열릴 때까지 대기
-
-volumes:
-  mysql-data:
-  mongo-data:
+    expose:
+      - "8080"
+    networks: [ app-net ]
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: ["java", "-jar", "app.jar"]  # wait-for-it 제거
 
 networks:
-  eureka-network:
+  app-net:
     driver: bridge

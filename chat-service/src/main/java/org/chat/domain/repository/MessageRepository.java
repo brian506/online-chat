@@ -7,9 +7,11 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
+import java.util.Optional;
+
 @Repository
-public interface MessageRepository extends ReactiveMongoRepository<Message,String> {
-    // 특정 채팅방의 메시지를 시간순으로 찾아 Flux<ChatMessage> 형태로 반환
-    Flux<Message> findByRoomIdOrderByTimestamp(String roomId);
+public interface MessageRepository extends MongoRepository<Message,String> {
+
+    Optional<Message> findByRoomIdOrderByTimestamp(String roomId);
 }
 

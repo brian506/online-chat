@@ -34,8 +34,9 @@ public class LoginService {
         User user = userRepository.findByEmail(userResponse.email()).
                 orElseGet(() -> saveUser(userResponse));
         log.info("저장된 사용자 이메일 : " + user.getEmail());
+        log.info("저장된 사용자 이름 : " + user.getName());
 
-        String accessToken = jwtService.createAccessToken(new AccessTokenPayload(user.getEmail(), Role.GENERAL, new Date()));
+        String accessToken = jwtService.createAccessToken(new AccessTokenPayload(user.getEmail(), user.getName(),Role.GENERAL, new Date()));
         String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(user.getEmail(), new Date()));
         user.setAccessToken(accessToken);
 
@@ -43,17 +44,11 @@ public class LoginService {
         Token token = new Token(user.getEmail(),refreshToken,Role.GENERAL);
         tokenRepository.save(token);
 
-        log.info("저장된 리프레시토큰 : " + token.getRefreshToken());
-
         return new LoginResponse(Role.GENERAL, accessToken, refreshToken);
     }
 
     private User saveUser(GoogleUserResponse response) {
-        User user = User.builder()
-                .email(response.email())
-                .role(Role.GENERAL)
-                .name(response.name())
-                .build();
+        User user = User.saveUser(response);
         return userRepository.save(user);
     }
 }

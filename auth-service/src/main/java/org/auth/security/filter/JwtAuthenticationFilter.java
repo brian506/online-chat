@@ -11,10 +11,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.auth.domain.entity.Role;
 import org.auth.domain.entity.Token;
+import org.auth.domain.repository.UserRepository;
 import org.auth.domain.repository.redis.TokenRepository;
 import org.auth.security.dto.response.AccessTokenPayload;
 import org.auth.security.service.CookieService;
 import org.auth.security.service.JwtService;
+import org.common.utils.OptionalUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final CookieService cookieService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -80,9 +83,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         Token token = tokenRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new JwtException("Redis에 존재하지 않거나 만료된 Refresh Token 입니다."));
+        String username = String.valueOf(OptionalUtil.getOrElseThrow(userRepository.findByEmail(token.getEmail()),"존재하지 않는 사용자입니다."));
 
         String newAccessToken = jwtService.createAccessToken(
-                new AccessTokenPayload(token.getEmail(), Role.GENERAL, new Date())
+                new AccessTokenPayload(token.getEmail(),username, Role.GENERAL, new Date())
         );
 
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);
