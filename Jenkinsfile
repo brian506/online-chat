@@ -69,8 +69,10 @@ pipeline {
         }
         // 5. 도커 이미지 빌드 및 모든 서비스 시작
         stage('Deploy Services') {
-            echo 'Building images and starting all services ...'
-            sh "docker-compose -f ${COMPOSE_FILE} up --build -d"
+            steps {
+                echo 'Building images and starting all services ...'
+                sh "docker-compose -f ${COMPOSE_FILE} up --build -d"
+            }
         }
     }
 }
