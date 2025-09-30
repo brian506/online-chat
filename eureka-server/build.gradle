@@ -1,4 +1,11 @@
+bootJar {
+    enabled = true
+}
 
+// bootJar와 충돌을 피하기 위해 일반 jar는 비활성화합니다.
+jar {
+    enabled = false
+}
 springBoot {
     mainClass = 'org.eureka.EurekaApplication'
 }
