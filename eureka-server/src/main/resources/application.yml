@@ -14,6 +14,3 @@ eureka:
     # false: 나는 서버이므로, 다른 유레카 서버로부터 서비스 목록을 가져오지 않음
     fetch-registry: false
 
-  server:
-    enable-self-preservation: false
-    wait-time-in-ms-when-sync-empty: 0

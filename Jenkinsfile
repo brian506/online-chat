@@ -21,7 +21,7 @@ pipeline {
                     steps {
                         dir('eureka-server'){
                             echo 'Building Eureka Server ...'
-                            sh './gradlew clean build -x test'
+                            sh '../gradlew clean build -x test'
                         }
                     }
                 }
@@ -29,7 +29,7 @@ pipeline {
                     steps {
                         dir('gateway-service') {
                             echo 'Building Gateway Service ...'
-                            sh './gradlew clean build -x test'
+                            sh '../gradlew clean build -x test'
                         }
                     }
                 }
@@ -37,7 +37,7 @@ pipeline {
                     steps {
                         dir('auth-service') {
                             echo 'Building Auth Service ...'
-                            sh './gradlew clean build -x test'
+                            sh '../gradlew clean build -x test'
                         }
                     }
                 }
@@ -45,7 +45,7 @@ pipeline {
                     steps {
                         dir('chat-service') {
                             echo 'Building Chat Service ...'
-                            sh './gradlew clean build -x test'
+                            sh '../gradlew clean build -x test'
                         }
                     }
                 }
