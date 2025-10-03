@@ -17,11 +17,43 @@ pipeline {
         }
 
         stage('Build Jar') {
-            steps {
-                echo "=== Gradle Build ==="
-                sh '../gradlew clean build -x test'
-            }
-        }
+                            stage('Build Eureka Server'){
+                                steps {
+                                    dir('eureka-server'){
+                                        echo 'Building Eureka Server ...'
+                                        sh '../gradlew clean build -x test' // gradlew 파일이 루트디렉토리에 있으므로 ''../''
+                                        // sh './gradlew :eureka-server:clean :eureka-server:build -x test' // 보통 멀티 모듈에서 이렇게 설정
+                                    }
+                                }
+                            }
+                            stage('Build Gateway Service') {
+                                steps {
+                                    dir('gateway-service') {
+                                        echo 'Building Gateway Service ...'
+                                        sh '../gradlew clean build -x test'
+                                    }
+                                }
+                            }
+                            stage('Build Auth Service') {
+                                steps {
+                                    dir('auth-service') {
+                                        echo 'Building Auth Service ...'
+                                        sh '../gradlew clean build -x test'
+                                    }
+                                }
+                            }
+                            stage('Build Chat Service') {
+                                steps {
+                                    dir('chat-service') {
+                                        echo 'Building Chat Service ...'
+                                        sh '../gradlew clean build -x test'
+
+                                    }
+                                }
+                            }
+                     }
+                                                    
+
 
         stage('Build Docker Images') {
             steps {
