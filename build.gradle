@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id "org.sonarqube" version "5.0.0.4638"
 }
 
 bootJar {
@@ -13,13 +12,6 @@ jar {
 	enabled = true
 }
 
-sonarqube {
-	properties {
-		property "sonar.projectKey", "brian506_online-chat" // 1. SonarCloud 프로젝트 키
-		property "sonar.organization", "brian506"           // 2. SonarCloud 조직 키
-		property "sonar.host.url", "https://sonarcloud.io"
-	}
-}
 
 allprojects {
 	group = 'com.example'
