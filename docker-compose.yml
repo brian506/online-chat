@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   eureka-server:
-    image: brian506/eureka-server:1.0.3
+    image: brianchoi506/eureka-server:1.0.3
     container_name: eureka-server
     env_file:
       - [ .env.prod ]
@@ -26,7 +26,7 @@ services:
         max-file: "3"
 
   gateway-server:
-    image: brian506/gateway-server:1.0.3
+    image: brianchoi506/gateway-server:1.0.3
     container_name: gateway-server
     env_file: [ .env.prod ]                 # 서버(EC2)에만 존재
     environment:
@@ -46,7 +46,7 @@ services:
         max-file: "3"
 
   auth-service:
-    image: brian506/auth-service:1.0.3
+    image: brianchoi506/auth-service:1.0.3
     container_name: auth-service
     env_file: [ .env.prod ]                 # DB/REDIS 엔드포인트는 .env로 주입 (RDS/ElastiCache)
     environment:
@@ -67,7 +67,7 @@ services:
     command: ["java", "-jar", "app.jar"]  # wait-for-it 제거
 
   chat-service:
-    image: brian506/chat-service:1.0.3
+    image: brianchoi506/chat-service:1.0.3
     container_name: chat-service
     env_file: [ .env.prod ]                 # MONGODB_URI는 Atlas/클러스터 주소로
     environment:
