@@ -18,10 +18,15 @@ pipeline {
 
         stage('Build Jar') {
             steps {
-                echo "=== Gradle Build ==="
-                sh '../gradlew clean build -x test'
-            }
+                    echo '=== Gradle Build ==='
+                    sh './gradlew :eureka-server:clean :eureka-server:build -x test'
+                    sh './gradlew :gateway-service:clean :gateway-service:build -x test'
+                    sh './gradlew :auth-service:clean :auth-service:build -x test'
+                    sh './gradlew :chat-service:clean :chat-service:build -x test'
+                }
         }
+
+
 
         stage('Build Docker Images') {
             steps {
