@@ -1,8 +1,14 @@
 
 pipeline {
-  agent any
+  agent {
+      dockerfile {
+        filename 'Dockerfile.jenkins'
+        // ✨ 이 부분이 핵심: 에이전트 컨테이너를 root 권한으로 실행
+        args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
+      }
+    }
 
-  // ❌ skipDefaultCheckout(true) 사용하지 않음 (SCM이 자동 체크아웃)
+
   environment {
     DOCKER_HUB_USER = 'brianchoi506'
     DOCKER_HUB_PASS = credentials('docker-hub-id')   // Secret text
