@@ -61,13 +61,13 @@ pipeline {
           sshUserPrivateKey(credentialsId: 'ec2-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')
         ]) {
           sh """
-            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'mkdir -p ~/app'
-            scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$ENV_FILE" $SSH_USER@${EC2_HOST#*@}:~/app/.env.prod
-            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} '
-              cd ~/app &&
-              docker-compose pull &&
-              docker-compose up -d
-            '
+            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $EC2_HOST 'mkdir -p ~/app'
+              scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$ENV_FILE" $EC2_HOST:~/app/.env.prod
+              ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $EC2_HOST '
+                cd ~/app &&
+                docker-compose pull &&
+                docker-compose up -d
+              '
           """
         }
       }
