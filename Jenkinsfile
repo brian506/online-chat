@@ -69,8 +69,11 @@ pipeline {
   }
 
   post {
-    always  { echo '=== Pipeline Finished ===' }
+    always  {
+    echo '=== Pipeline Finished ==='
     cleanWs()
+    }
+
     success { echo '✅ 배포 성공!' }
     failure { echo '❌ 배포 실패!' }
   }
