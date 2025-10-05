@@ -25,9 +25,9 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  gateway-server:
-    image: brianchoi506/gateway-server:1.0.3
-    container_name: gateway-server
+  gateway-service:
+    image: brianchoi506/gateway-service:1.0.3
+    container_name: gateway-service
     env_file: [ .env.prod ]                 # 서버(EC2)에만 존재
     environment:
       SPRING_PROFILES_ACTIVE: prod
