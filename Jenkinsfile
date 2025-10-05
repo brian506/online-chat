@@ -1,6 +1,6 @@
 pipeline {
     agent any
-
+    options { skipDefaultCheckout(true) }  // 자동체크아웃 비활성화
     environment {
         DOCKER_HUB_USER = "brianchoi506"   // Docker Hub ID
         DOCKER_HUB_PASS = credentials('docker-hub-id') // Jenkins Credentials: Docker Hub 비밀번호 or 토큰
@@ -10,9 +10,11 @@ pipeline {
 
     stages {
         stage('Checkout') {
-           echo '=== Cloning from GitHub ==='
-                   git branch: 'main',
-                       url: 'https://github.com/brian506/online-chat.git',
+           steps {
+                   deleteDir() // 깨끗한 워크스페이스
+                   echo '=== Cloning from GitHub ==='
+                   git url: 'https://github.com/brian506/online-chat.git',
+                       branch: 'main',
                        credentialsId: 'github-token'
                }
         }
