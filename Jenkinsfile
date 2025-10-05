@@ -16,6 +16,7 @@ pipeline {
                    git url: 'https://github.com/brian506/online-chat.git',
                        branch: 'main',
                        credentialsId: 'github-token'
+                   sh 'pwd && ls -la && git rev-parse --is-inside-work-tree || true'
                }
         }
 
