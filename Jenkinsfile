@@ -1,12 +1,6 @@
 
 pipeline {
-  agent {
-      dockerfile {
-        filename 'Dockerfile.jenkins'
-        // ✨ 이 부분이 핵심: 에이전트 컨테이너를 root 권한으로 실행
-        args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
-      }
-    }
+  agent
 
 
   environment {
