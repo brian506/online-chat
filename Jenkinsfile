@@ -11,8 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo "=== Git Checkout ==="
-                git branch: 'main', url: 'https://github.com/brian506/online-chat.git'
+                checkout scm
             }
         }
 
