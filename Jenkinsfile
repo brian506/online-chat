@@ -10,9 +10,11 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                checkout scm
-            }
+           echo '=== Cloning from GitHub ==='
+                   git branch: 'main',
+                       url: 'https://github.com/brian506/online-chat.git',
+                       credentialsId: 'github-token'
+               }
         }
 
         stage('Build Jar') {
