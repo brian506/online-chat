@@ -53,26 +53,21 @@ pipeline {
           file(credentialsId: 'env-file',          variable: 'ENV_FILE'),
           sshUserPrivateKey(credentialsId: 'ec2-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')
         ]) {
+        sh '''
+            set -e
 
-                            sh '''
-                             # 1) 디렉터리 준비
-                               ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'mkdir -p ~/app'
+            # 접속/경로 준비
+            ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} \
+              'mkdir -p ~/app && sudo chown -R ubuntu:ubuntu ~/app && sudo chmod 775 ~/app'
 
-                               # 2) .env.prod 업로드 (scp 대신 ssh+cat)
-                               #    로컬 파일을 표준입력으로 보내서 원격에 저장
-                               ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'cat > ~/app/.env.prod' < "$ENV_FILE"
+            # 업로드 (리다이렉션 대신 tee)
+            ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} \
+              "tee ~/app/.env.prod >/dev/null" < "$ENV_FILE"
 
-                               # 3) docker-compose.yml은 scp가 계속 막히면 이것도 cat로
-                               ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'cat > ~/app/docker-compose.yml' < docker-compose.yml
+            ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} \
+              "tee ~/app/docker-compose.yml >/dev/null" < docker-compose.yml
+          '''
 
-                               # 4) 배포
-                               ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} '
-                                 cd ~/app &&
-                                 (docker compose pull || docker-compose pull) &&
-                                 (docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans) &&
-                                 docker image prune -af
-                               '
-                             '''
         }
       }
     }
