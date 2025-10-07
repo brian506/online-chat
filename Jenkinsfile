@@ -45,44 +45,46 @@ pipeline {
       }
     }
 
-    stage('Deploy to EC2') {
-      steps {
-        echo '=== Deploy on EC2 ==='
-        // Secret file(.env.prod) + SSH Key(EC2) 두 개 크리덴셜 사용
-        withCredentials([
-          file(credentialsId: 'env-file',          variable: 'ENV_FILE'),
-          sshUserPrivateKey(credentialsId: 'ec2-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')
-        ]) {
-        sh """
-                    set -e # 명령어 실행 중 오류가 발생하면 즉시 중단합니다.
+stage('Deploy to EC2') {
+  steps {
+    echo '=== Deploy on EC2 (scp + ssh) ==='
+    withCredentials([
+      file(credentialsId: 'env-file',          variable: 'ENV_FILE'),
+      sshUserPrivateKey(credentialsId: 'ec2-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')
+    ]) {
 
-                    # environment 블록에 정의된 EC2_HOST 변수에서 호스트 주소만 추출합니다.
-                    HOST=\$(echo "$EC2_HOST" | cut -d'@' -f2)
+      sh '''
+        set -euo pipefail
+        HOST=${EC2_HOST#*@}
+        USER=$SSH_USER
 
-                    # --- 1단계: 원격 서버에 폴더 생성 ---
-                    # 'ubuntu' 유저의 권한으로 자신의 홈 디렉토리(~)에 폴더를 생성합니다.
-                    # 'sudo'를 사용하지 않는 것이 권한 문제를 피하는 핵심입니다.
-                    echo "--> Creating directory on EC2..."
-                    ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@\$HOST" 'mkdir -p ~/app'
+        echo "[1/4] connect test"
+        ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$USER@$HOST" 'id && whoami'
 
-                    # --- 2단계: scp로 파일 직접 복사 ---
-                    # 가장 단순하고 확실한 방법으로 필요한 파일들을 EC2에 전송합니다.
-                    echo "--> Copying files to EC2..."
-                    scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$ENV_FILE" "$SSH_USER@\$HOST":~/app/.env.prod
-                    scp -i "$SSH_KEY" -o StrictHostKeyChecking=no docker-compose.yml "$SSH_USER@\$HOST":~/app/docker-compose.yml
+        echo "[2/4] prepare dir on remote"
+        # 반드시 원격 블록을 '따옴표'로 묶어서 전체가 원격에서 실행되게 하기
+        ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$USER@$HOST" '
+          set -e
+          mkdir -p /home/ubuntu/app
+          ls -ld /home/ubuntu/app
+        '
 
-                    # --- 3단계: 원격 서버에서 Docker Compose 실행 ---
-                    # EC2 서버로 접속하여 컨테이너를 최신 버전으로 실행합니다.
-                    echo "--> Deploying with Docker Compose on EC2..."
-                    ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@\$HOST" '
-                      cd ~/app
-                      # docker compose (v2) 또는 docker-compose (v1) 명령어 모두 호환되도록 실행합니다.
-                      (docker compose pull || docker-compose pull) &&
-                      (docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans) &&
-                      echo "--> Cleaning up old images on EC2..."
-                      docker image prune -af
-                    '
-                  """
+        echo "[3/4] upload files via scp (no sudo)"
+        # 절대경로로 지정 (~/ 대신 /home/ubuntu 사용)
+        scp -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
+          "$ENV_FILE" "$USER@$HOST":/home/ubuntu/app/.env.prod
+        scp -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
+          docker-compose.yml "$USER@$HOST":/home/ubuntu/app/docker-compose.yml
+
+        echo "[4/4] deploy with docker compose"
+        ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$USER@$HOST" '
+          set -e
+          cd /home/ubuntu/app
+          (docker compose pull || docker-compose pull)
+          (docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans)
+          docker image prune -af || true
+        '
+      '''
         }
       }
     }
