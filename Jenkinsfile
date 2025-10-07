@@ -53,18 +53,25 @@ pipeline {
           file(credentialsId: 'env-file',          variable: 'ENV_FILE'),
           sshUserPrivateKey(credentialsId: 'ec2-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')
         ]) {
-                 sh '''
-                   ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} '
-                     sudo mkdir -p /home/ubuntu/app &&
-                     sudo chown -R ubuntu:ubuntu /home/ubuntu/app
-                   '
-                   scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$ENV_FILE" $SSH_USER@${EC2_HOST#*@}:/home/ubuntu/app/.env.prod
-                   ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} '
-                     cd /home/ubuntu/app &&
-                     (docker compose pull || docker-compose pull) &&
-                     (docker compose up -d || docker-compose up -d)
-                   '
-                 '''
+                            // ✨ sudo를 제거하여 모든 문제를 해결합니다.
+                            sh '''
+                              # 1. ubuntu 유저 권한으로 홈 디렉토리에 폴더 생성 (sudo 불필요)
+                              ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'mkdir -p /home/ubuntu/app'
+
+                              # 2. 필요한 파일들 전송 (docker-compose.yml도 함께 전송)
+                              scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$ENV_FILE" $SSH_USER@${EC2_HOST#*@}:/home/ubuntu/app/.env.prod
+                              scp -i "$SSH_KEY" -o StrictHostKeyChecking=no docker-compose.yml $SSH_USER@${EC2_HOST#*@}:/home/ubuntu/app/docker-compose.yml
+
+                              # 3. EC2에서 docker compose 실행
+                              ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} '
+                                set -e
+                                cd /home/ubuntu/app
+                                (docker compose pull || docker-compose pull) &&
+                                (docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans)
+                                echo "Cleaning up old images..."
+                                docker image prune -af
+                              '
+                            '''
         }
       }
     }
