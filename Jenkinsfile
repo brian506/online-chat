@@ -53,20 +53,36 @@ pipeline {
           file(credentialsId: 'env-file',          variable: 'ENV_FILE'),
           sshUserPrivateKey(credentialsId: 'ec2-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')
         ]) {
-        sh '''
-            set -e
+         sh '''
+                set -e
+                HOST=${EC2_HOST#*@}
+                USER=$SSH_USER
 
-            # 접속/경로 준비
-            ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} \
-              'mkdir -p ~/app && sudo chown -R ubuntu:ubuntu ~/app && sudo chmod 775 ~/app'
+                # 0) 접속 확인
+                ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $USER@$HOST 'id && whoami'
 
-            # 업로드 (리다이렉션 대신 tee)
-            ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} \
-              "tee ~/app/.env.prod >/dev/null" < "$ENV_FILE"
+                # 1) (원격에서 한 번에) 디렉토리 생성 + 소유/권한 정리  ⬅️ 반드시 따옴표로 감싸기!
+                ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $USER@$HOST '
+                  set -e
+                  sudo install -d -o ubuntu -g ubuntu -m 775 /home/ubuntu/app
+                '
 
-            ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} \
-              "tee ~/app/docker-compose.yml >/dev/null" < docker-compose.yml
-          '''
+                # 2) 업로드 (리다이렉션 대신 tee, 절대경로) — 필요시 sudo tee 사용
+                ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $USER@$HOST \
+                  "tee /home/ubuntu/app/.env.prod >/dev/null" < "$ENV_FILE"
+
+                ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $USER@$HOST \
+                  "tee /home/ubuntu/app/docker-compose.yml >/dev/null" < docker-compose.yml
+
+                # 3) 배포
+                ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no $USER@$HOST '
+                  set -e
+                  cd /home/ubuntu/app
+                  (docker compose pull || docker-compose pull)
+                  (docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans)
+                  docker image prune -af || true
+                '
+              '''
 
         }
       }
