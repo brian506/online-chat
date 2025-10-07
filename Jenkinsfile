@@ -53,25 +53,26 @@ pipeline {
           file(credentialsId: 'env-file',          variable: 'ENV_FILE'),
           sshUserPrivateKey(credentialsId: 'ec2-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')
         ]) {
-                            // ✨ sudo를 제거하여 모든 문제를 해결합니다.
+
                             sh '''
-                              # 1. ubuntu 유저 권한으로 홈 디렉토리에 폴더 생성 (sudo 불필요)
-                              ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'mkdir -p /home/ubuntu/app'
+                             # 1) 디렉터리 준비
+                               ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'mkdir -p ~/app'
 
-                              # 2. 필요한 파일들 전송 (docker-compose.yml도 함께 전송)
-                              scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$ENV_FILE" $SSH_USER@${EC2_HOST#*@}:/home/ubuntu/app/.env.prod
-                              scp -i "$SSH_KEY" -o StrictHostKeyChecking=no docker-compose.yml $SSH_USER@${EC2_HOST#*@}:/home/ubuntu/app/docker-compose.yml
+                               # 2) .env.prod 업로드 (scp 대신 ssh+cat)
+                               #    로컬 파일을 표준입력으로 보내서 원격에 저장
+                               ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'cat > ~/app/.env.prod' < "$ENV_FILE"
 
-                              # 3. EC2에서 docker compose 실행
-                              ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} '
-                                set -e
-                                cd /home/ubuntu/app
-                                (docker compose pull || docker-compose pull) &&
-                                (docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans)
-                                echo "Cleaning up old images..."
-                                docker image prune -af
-                              '
-                            '''
+                               # 3) docker-compose.yml은 scp가 계속 막히면 이것도 cat로
+                               ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} 'cat > ~/app/docker-compose.yml' < docker-compose.yml
+
+                               # 4) 배포
+                               ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $SSH_USER@${EC2_HOST#*@} '
+                                 cd ~/app &&
+                                 (docker compose pull || docker-compose pull) &&
+                                 (docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans) &&
+                                 docker image prune -af
+                               '
+                             '''
         }
       }
     }
