@@ -12,7 +12,8 @@ services:
       MYSQL_ROOT_HOST: '%'
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
-    networks: [ eureka-network ]
+    networks:
+      - eureka-network
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -34,7 +35,8 @@ services:
     restart: always
     ports:
       - "6381:6379"
-    networks: [ eureka-network ]
+    networks:
+      - eureka-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -51,7 +53,8 @@ services:
     restart: always
     ports:
       - "6380:6379"
-    networks: [ eureka-network ]
+    networks:
+      - eureka-network
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
@@ -68,7 +71,8 @@ services:
     restart: always
     ports:
       - "27017:27017"
-    networks: [ eureka-network ]
+    networks:
+      - eureka-network
     volumes:
       - mongo-data:/data/db
     healthcheck:
@@ -89,7 +93,8 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8761:8761"
-    networks: [ eureka-network ]
+    networks:
+      - eureka-network
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8761/actuator/health"]
       interval: 10s
@@ -102,18 +107,20 @@ services:
       options: { max-size: "10m", max-file: "3" }
     command: ["java", "-jar", "app.jar"]
 
-  gateway-server:
+  gateway-service:
     build: ./gateway-service
-    container_name: gateway-server
+    container_name: gateway-service
     environment:
       TZ: Asia/Seoul
       SPRING_PROFILES_ACTIVE: docker
-    env_file: [ .env.local ]
+    env_file:
+      - .env.local
     depends_on:
       eureka-server: { condition: service_healthy }
     ports:
       - "19091:19091"
-    networks: [ eureka-network ]
+    networks:
+      - eureka-network
     restart: always
     logging:
       driver: json-file
@@ -126,14 +133,16 @@ services:
     environment:
       TZ: Asia/Seoul
       SPRING_PROFILES_ACTIVE: docker
-    env_file: [ .env.local ]
+    env_file:
+      - .env.local
     depends_on:
       mysql: { condition: service_healthy }
       refresh-token-redis: { condition: service_healthy }
       eureka-server: { condition: service_healthy }
     ports:
       - "8080:8080"
-    networks: [ eureka-network ]
+    networks:
+      - eureka-network
     restart: always
     logging:
       driver: json-file
@@ -146,14 +155,16 @@ services:
     environment:
       TZ: Asia/Seoul
       SPRING_PROFILES_ACTIVE: docker
-    env_file: [ .env.local ]
+    env_file:
+      - .env.local
     depends_on:
       eureka-server: { condition: service_healthy }
       mongodb: { condition: service_healthy }
       presence-user-redis: { condition: service_healthy }
     ports:
       - "8081:8080"
-    networks: [ eureka-network ]
+    networks:
+      - eureka-network
     restart: always
     logging:
       driver: json-file
