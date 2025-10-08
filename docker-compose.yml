@@ -12,12 +12,12 @@ services:
     expose:
       - "8761"                         # 내부 통신만
     networks: [ app-net ]
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8761/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 60s
+#    healthcheck:
+#      test: ["CMD", "curl", "-fsS", "http://localhost:8761/actuator/health"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 100s
     restart: always
     logging:
       driver: json-file
