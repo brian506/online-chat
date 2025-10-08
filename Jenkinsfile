@@ -24,10 +24,10 @@ pipeline {
             steps {
                 echo '=== Docker Build ==='
                 sh """
-                    docker build -t $DOCKER_HUB_USER/eureka-server:1.0.3 ./eureka-server
-                    docker build -t $DOCKER_HUB_USER/gateway-service:1.0.3 ./gateway-service
-                    docker build -t $DOCKER_HUB_USER/auth-service:1.0.3 ./auth-service
-                    docker build -t $DOCKER_HUB_USER/chat-service:1.0.3 ./chat-service
+                    docker build --platform linux/amd64 -t $DOCKER_HUB_USER/eureka-server:1.0.3 ./eureka-server
+                    docker build --platform linux/amd64 -t $DOCKER_HUB_USER/gateway-service:1.0.3 ./gateway-service
+                    docker build --platform linux/amd64 -t $DOCKER_HUB_USER/auth-service:1.0.3 ./auth-service
+                    docker build --platform linux/amd64 -t $DOCKER_HUB_USER/chat-service:1.0.3 ./chat-service
                 """
             }
         }
