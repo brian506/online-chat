@@ -53,7 +53,7 @@ pipeline {
                     file(credentialsId: 'env-file', variable: 'ENV_FILE'),
                     sshUserPrivateKey(credentialsId: 'ec2-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')
                 ]) {
-                    sh '''
+                    sh '''#!/bin/bash
 set -euo pipefail
 HOST=$(echo "$EC2_HOST" | cut -d'@' -f2)
 USER=$SSH_USER
