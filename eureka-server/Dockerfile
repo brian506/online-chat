@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64 openjdk:21-jdk-slim
+FROM openjdk:21-jdk-slim
 
 USER root
 RUN apt-get update && apt-get install -y curl # curl 명령어 사용하기 위해
