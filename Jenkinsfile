@@ -76,11 +76,12 @@ scp -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
 
 echo "[4/4] deploy with docker compose"
 ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no "$USER@$HOST" '
-    set -e
-    cd /home/ubuntu/app
-    (docker compose pull || docker-compose pull)
-    (docker compose up -d --remove-orphans || docker-compose up -d --remove-orphans)
-    docker image prune -af || true
+   set -e
+       export PATH=$PATH:/usr/local/bin:/usr/libexec/docker/cli-plugins
+       cd /home/ubuntu/app
+       docker compose pull
+       docker compose up -d --remove-orphans
+       docker image prune -af || true
 '
 '''
                 }
