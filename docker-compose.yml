@@ -5,7 +5,7 @@ services:
     image: brianchoi506/eureka-server:1.0.3
     container_name: eureka-server
     env_file:
-      - [ .env.prod ]
+      - .env.prod
     environment:
       SPRING_PROFILES_ACTIVE: prod
       TZ: Asia/Seoul
@@ -28,7 +28,8 @@ services:
   gateway-service:
     image: brianchoi506/gateway-service:1.0.3
     container_name: gateway-service
-    env_file: [ .env.prod ]                 # 서버(EC2)에만 존재
+    env_file: # 서버(EC2)에만 존재
+      - .env.prod
     environment:
       SPRING_PROFILES_ACTIVE: prod
       TZ: Asia/Seoul
@@ -48,7 +49,8 @@ services:
   auth-service:
     image: brianchoi506/auth-service:1.0.3
     container_name: auth-service
-    env_file: [ .env.prod ]                 # DB/REDIS 엔드포인트는 .env로 주입 (RDS/ElastiCache)
+    env_file:
+      - .env.prod               # DB/REDIS 엔드포인트는 .env로 주입 (RDS/ElastiCache)
     environment:
       SPRING_PROFILES_ACTIVE: prod
       TZ: Asia/Seoul
@@ -64,12 +66,13 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    command: ["java", "-jar", "app.jar"]  # wait-for-it 제거
+    command: ["java", "-jar", "app.jar"]
 
   chat-service:
     image: brianchoi506/chat-service:1.0.3
     container_name: chat-service
-    env_file: [ .env.prod ]                 # MONGODB_URI는 Atlas/클러스터 주소로
+    env_file:   # MONGODB_URI는 Atlas/클러스터 주소로
+      - .env.prod
     environment:
       SPRING_PROFILES_ACTIVE: prod
       TZ: Asia/Seoul
@@ -85,7 +88,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    command: ["java", "-jar", "app.jar"]  # wait-for-it 제거
+    command: ["java", "-jar", "app.jar"]
 
 networks:
   app-net:
