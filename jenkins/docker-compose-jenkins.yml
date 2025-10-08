@@ -1,7 +1,7 @@
 services:
   jenkins:
     build:
-      context: ..
+      context: .
       dockerfile: Dockerfile
     container_name: jenkins
     ports:
