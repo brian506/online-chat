@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
 
@@ -34,8 +35,9 @@ public class JwtService {
     private long refreshKeyExpiration;
 
 
-    public JwtService(@Value("${jwt.secret-key}") String secretKey) {
-        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+    public JwtService(@Value("${jwt.secretKey}") String secretKey) {
+        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
     // 커스텀 예외 추가
@@ -49,9 +51,9 @@ public class JwtService {
 
     public String createAccessToken(final AccessTokenPayload payload) {
         return Jwts.builder()
-                .setSubject(payload.email())
+                .setSubject(payload.userId())
                 .claim("role", payload.role().getKey())
-                .claim("username",payload.username())
+                .claim("email",payload.email())
                 .setIssuer(issuer)
                 .setIssuedAt(payload.date())
                 .setExpiration(new Date(payload.date().getTime() + accessKeyExpiration * 1000L))
@@ -61,7 +63,7 @@ public class JwtService {
 
     public String createRefreshToken(final RefreshTokenPayload payload) {
         return Jwts.builder()
-                .setSubject(payload.email())
+                .setSubject(payload.userId())
                 .setIssuer(issuer)
                 .setIssuedAt(payload.date())
                 .setExpiration(new Date(payload.date().getTime() + refreshKeyExpiration + 1000L))

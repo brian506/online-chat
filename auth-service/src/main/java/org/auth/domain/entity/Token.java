@@ -7,6 +7,8 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.util.UUID;
+
 @RedisHash(value = "refresh_token",timeToLive = 604800) // 7일
 @AllArgsConstructor
 @Getter
@@ -14,7 +16,7 @@ import org.springframework.data.redis.core.RedisHash;
 public class Token  {
 
     @Id
-    private String email;
+    private String userId;
 
     private String refreshToken;
 

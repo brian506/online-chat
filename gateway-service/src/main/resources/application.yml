@@ -6,37 +6,63 @@ spring:
     web-application-type: reactive
   application:
     name: gateway-service
+
   cloud:
     gateway:
+      # --- CORS (게이트웨이에서 전부 처리) ---
       globalcors:
         add-to-simple-url-handler-mapping: true
         corsConfigurations:
           '[/**]':
             allowedOrigins:
-              - http://127.0.0.1:5500
-            allowedMethods: [ GET, POST, OPTIONS ]
-            allowedHeaders: [ Authorization, Content-Type ]
+              - "http://127.0.0.1:5500"
+              - "http://localhost:5500"
+              - "http://127.0.0.1:5173"
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - Authorization
+              - Content-Type
+              - X-Requested-With
+            exposedHeaders:
+              - Authorization
             allowCredentials: true
             maxAge: 3600
-        default-filters:
-          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+      # 공통 필터
       default-filters:
-        - AuthenticationFilter
-      server:
-        webflux:
-          # 라우팅 관련 설정은 모두 여기로 이동
-          routes:
-            - id: auth-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/oauth2/**
-            - id: chat-service
-              uri: lb:http://chat-service # "ws:" 까지 커버됨
-              predicates:
-                - Path=/chat/**
-          discovery:
-            locator:
-              enabled: true
+        # 동일 CORS 헤더 중복 방지
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin RETAIN_UNIQUE
+
+        - name: AuthenticationFilter
+
+
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/oauth2/**
+        - id: chat-api
+          uri: lb://chat-service
+          predicates:
+            - Path=/chat/**
+
+        - id: chat-ws
+          uri: lb://chat-service
+          predicates:
+            - Path=/chat-ws/**
+
+
+      discovery:
+        locator:
+          enabled: true
+
     loadbalancer:
       cache:
         enabled: false
@@ -48,10 +74,14 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_URL}
 
-
 jwt:
   secretKey: ${JWT_KEY}
-
+  access:
+    expiration: 3600000 # 1시간
+    header: Authorization
+  refresh:
+    expiration: 1209600000 # 14일
+    header: Authorization-refresh
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG

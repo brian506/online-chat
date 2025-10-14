@@ -30,7 +30,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     private final JwtUtil jwtUtil;
     private final String LOGIN_URL = "/oauth2/callback/google/login";
-    private final String WEBSOCKET_URL = "/chat";
+    private final String WEBSOCKET_URL = "/chat-ws";
 
     public AuthenticationFilter(JwtUtil jwtUtil) {
         super(Config.class);
@@ -59,6 +59,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             }
 
             // 웹소켓 연결은 인증 헤더만 체크 후  다음 필터로 넘어감
+            // 여기서 웹소켓,채팅 API 경로가 /chat 으로 같았어서 /chat 경로로 온 요청들은 jwt 필터를 통과하게 되어서 403 에러가 계속 떴었음 -> 경로 둘이 서로 다르게 세팅
             if(path.startsWith(WEBSOCKET_URL)){
                 log.info(">>> Gateway AuthenticationFilter 웹소켓 연결: {}", path);
                 return chain.filter(exchange);

@@ -4,6 +4,8 @@ server:
 spring:
  application:
   name: chat-service
+ config:
+  import: "optional:file:.env[.properties]"
  data:
   mongodb:
     uri: ${MONGO_DB_URL}
@@ -21,14 +23,21 @@ eureka:
 
 domain:
   websocket:
-    chat: /chat
+    chat: /chat-ws
     publish: /pub
     subscribe: /topic
 
 jwt:
   secretKey: ${JWT_KEY}
+  access:
+    expiration: 3600000 # 1시간
+    header: Authorization
+  refresh:
+    expiration: 1209600000 # 14일
+    header: Authorization-refresh
 
 logging:
   level:
     org.springframework.web: DEBUG
     org.springframework.web.socket: DEBUG
+    org.springframework.security: DEBUG

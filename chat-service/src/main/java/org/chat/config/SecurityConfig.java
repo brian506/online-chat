@@ -21,6 +21,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final TokenVerificationFilter tokenVerificationFilter;
@@ -29,11 +30,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(AbstractHttpConfigurer::disable) // 게이트웨이에서 처리된 CORS 설정을 따름
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/chat/**"))
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // CORS Preflight 요청 허용
-                        .requestMatchers("/chat/**","/ws/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/chat-ws/**").permitAll()
+                        .requestMatchers("/chat/**").hasAuthority("ROLE_GENERAL")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenVerificationFilter, UsernamePasswordAuthenticationFilter.class);

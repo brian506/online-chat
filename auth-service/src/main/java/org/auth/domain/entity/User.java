@@ -8,6 +8,8 @@ import org.auth.config.BaseTime;
 import org.auth.security.dto.response.GoogleUserResponse;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.UUID;
+
 
 @Entity
 @NoArgsConstructor
@@ -20,28 +22,24 @@ public class User extends BaseTime {
 
     @Id @GeneratedValue
     @Column(name = "user_id", nullable = false, updatable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "email", nullable = false, updatable = false)
     private String email;
 
-    @Column(name = "name", nullable = false, updatable = false)
-    private String name;
+    @Column(name = "username", nullable = false, updatable = false)
+    private String username;
 
     @Enumerated(EnumType.STRING)
     @Setter
     @Column(name = "user_role",nullable = false)
     private Role role;
 
-    @Setter
-    @Column(name = "access_token", nullable = true)
-    private String accessToken;
-
     public static User saveUser(GoogleUserResponse response){
         return User.builder()
                 .email(response.email())
                 .role(Role.GENERAL)
-                .name(response.name())
+                .username(response.name())
                 .build();
     }
 }

@@ -31,7 +31,7 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION,loginResponse.accessToken())
                 .header(HttpHeaders.SET_COOKIE,refreshTokenCookie)
-                .body(new SuccessResponse(true,"로그인 성공",loginResponse.role()));
+                .body(new SuccessResponse(true,"로그인 성공",loginResponse));
     }
 }
 /**

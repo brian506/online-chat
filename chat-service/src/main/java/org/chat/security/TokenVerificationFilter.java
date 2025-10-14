@@ -29,7 +29,7 @@ public class TokenVerificationFilter extends OncePerRequestFilter {
      * STOMP 메시징은 StompHandler 가 처리
      */
     private final JwtUtil jwtUtils;
-    private final String WEBSOCKET_URL = "/chat";
+    private final String WEBSOCKET_URL = "/chat-ws";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

@@ -34,14 +34,14 @@ public class LoginService {
         User user = userRepository.findByEmail(userResponse.email()).
                 orElseGet(() -> saveUser(userResponse));
         log.info("저장된 사용자 이메일 : " + user.getEmail());
-        log.info("저장된 사용자 이름 : " + user.getName());
 
-        String accessToken = jwtService.createAccessToken(new AccessTokenPayload(user.getEmail(), user.getName(),Role.GENERAL, new Date()));
-        String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(user.getEmail(), new Date()));
-        user.setAccessToken(accessToken);
+        String userId = String.valueOf(user.getId());
 
-        // refreshToken 레디스에 저장
-        Token token = new Token(user.getEmail(),refreshToken,Role.GENERAL);
+        String accessToken = jwtService.createAccessToken(new AccessTokenPayload(userId,user.getEmail(),Role.GENERAL, new Date()));
+        String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(userId, new Date()));
+        log.info("저장된 엑세스 토큰 : " + accessToken);
+        // refreshToken 레디스에 저장, 쿠키로 변환은 컨트롤러에서
+        Token token = new Token(userId,refreshToken,Role.GENERAL);
         tokenRepository.save(token);
 
         return new LoginResponse(Role.GENERAL, accessToken, refreshToken);
