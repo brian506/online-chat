@@ -2,4 +2,4 @@ package org.chat.domain.dto;
 
 
 
-public record Sender (Long userId, String name){ }
+public record Sender (String nickname, String name){ }

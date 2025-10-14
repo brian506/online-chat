@@ -11,7 +11,9 @@ import java.util.Set;
 public class ChatRoomUserService {
 
     /**
+     * 방에 참여자 목록 위한 레디스
      * 서버가 여러개 일때를 고려하여 sessionId 도 레디스에서 관리
+     * 추후에 단체방에서 사용
      */
 
     private final StringRedisTemplate redisTemplate;
@@ -26,15 +28,15 @@ public class ChatRoomUserService {
     }
 
     // 사용자 추가
-    public void addUser(String roomId, String username,String sessionId){
-        redisTemplate.opsForSet().add(getRoomKey(roomId),username);
+    public void addUser(String roomId, String nickname,String sessionId){
+        redisTemplate.opsForSet().add(getRoomKey(roomId),nickname);
         redisTemplate.opsForValue().set(getSessionKey(sessionId), roomId);
     }
     // 사용자 제거(세션에서 roomId 찾아서 제거)
-    public String removeUser(String username,String sessionId){
+    public String removeUser(String nickname,String sessionId){
         String roomId = redisTemplate.opsForValue().get(getSessionKey(sessionId));
         if (roomId != null) {
-            redisTemplate.opsForSet().remove(getRoomKey(roomId), username);
+            redisTemplate.opsForSet().remove(getRoomKey(roomId), nickname);
             redisTemplate.delete(getSessionKey(sessionId));
         }
         return roomId;

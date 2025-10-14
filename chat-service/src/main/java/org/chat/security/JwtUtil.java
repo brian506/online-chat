@@ -18,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.security.Principal;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,18 +46,16 @@ public class JwtUtil {
     public Authentication getAuthentication(String accessToken) {
         // 여기서 jwt 토큰 검증
         Claims claims = parseClaims(accessToken);
-        String email = claims.getSubject();
+        String userId = claims.getSubject();
         String role = claims.get("role", String.class);
-        String username = claims.get("username",String.class);
-
-        StompPrincipal principal = new StompPrincipal(username,email); // username 먼저해야 Principal 객체 안에서 username 이 나옴
+        StompPrincipal principal = new StompPrincipal(userId);
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
         return new UsernamePasswordAuthenticationToken(principal,null,List.of(grantedAuthority));
     }
-    // 토큰 안에 있는 사용자 이름만 반환하기 위한 메소드
-    public String getUsernameFromToken(final String accessToken) {
+
+    public String getEmailFromToken(final String accessToken){
         Claims claims = parseClaims(accessToken);
-        return claims.get("username",String.class);
+        return claims.get("email",String.class);
     }
 
     public Optional<String> extractAccessToken(HttpServletRequest request) {
@@ -65,7 +65,7 @@ public class JwtUtil {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

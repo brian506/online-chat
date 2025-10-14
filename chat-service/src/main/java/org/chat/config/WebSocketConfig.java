@@ -15,10 +15,9 @@ import org.springframework.web.socket.config.annotation.*;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
-    private final JwtUtil jwtUtil;
 
     @Value("${domain.websocket.chat}")
-    private String chatUrl; // /game
+    private String chatUrl; // /chat-ws
 
     @Value("${domain.websocket.publish}")
     private String pub; // /pub
@@ -36,7 +35,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // todo 웹소켓에 접속허용할 주소 설정
         registry.addEndpoint(chatUrl)
-                .setAllowedOriginPatterns("http://127.0.0.1:5500"); // cors 검사가 아닌 origin 핸드셰이크 허
+                .setAllowedOriginPatterns("http://127.0.0.1:5500","http://localhost:5500"); // cors 검사가 아닌 origin 핸드셰이크 허
         // sockJS() 안쓰므로 네이티브 웹소켓임
 
     }
