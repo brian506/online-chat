@@ -29,8 +29,8 @@ public class ChatController {
     public ResponseEntity<?> createRoom(@AuthenticationPrincipal StompPrincipal me,
                                         @RequestBody CreateRoomRequest request){
         RoomUserResponse roomUserResponse = roomService.createRoom(me.getUserId(), request.targetId());
-        log.info("사용자 ID 값 제대로 들어오는 지????? : " + me.getName() , request.targetId());
-        SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",roomUserResponse.roomId());
+        log.info("createRoom me={}, target={}", me.getName(), request.targetId());
+        SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",roomUserResponse);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
