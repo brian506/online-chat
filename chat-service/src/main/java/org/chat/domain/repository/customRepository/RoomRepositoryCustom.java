@@ -1,10 +1,14 @@
 package org.chat.domain.repository.customRepository;
 
-import org.chat.domain.dto.response.RoomResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
+import org.chat.domain.entity.Room;
+import org.chat.domain.entity.UserType;
+
+
+
+import java.util.List;
+
 
 public interface RoomRepositoryCustom {
-    Page<RoomResponse> findMyAsk(String userId, Pageable pageable);
-    Page<RoomResponse> findMyAnswer(String userId, Pageable pageable);
+     List<Room> findRoomsByUserAndType(String userId, UserType userType, String cursor);
 }

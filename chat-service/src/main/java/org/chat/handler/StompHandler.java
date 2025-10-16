@@ -42,18 +42,19 @@ public class StompHandler implements ChannelInterceptor {
             Authentication authentication = jwtUtil.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             accessor.setUser(authentication);
-            //  이후 프레임에서도 읽히도록
+            //  이후 프레임에서도 userId 값 추출하기 위해
+            createUserSession(authentication,accessor);
             accessor.setLeaveMutable(true);
             log.info("✅ STOMP CONNECT 인증 성공: user={}", authentication.getName());
         }
         return message;
     }
-}
 
-    // 사용자 이름을 세션에 저장하고 꺼내서 쓰는 메서드
-    // CONNECT 시 accessor 에 저장해둔 authenticaiton 이 이후의 SUBSCRIBE,CONNECT 등 값이 파싱이 안돼서 세션에도 따로 저장해서 쓰도록함
-//    private void createUserSession(Authentication authentication,StompHeaderAccessor accessor){
-//        var principal = (StompPrincipal) authentication.getPrincipal();
-//        accessor.getSessionAttributes().put("username", principal.getUsername());
-//    }
-//}
+
+     //사용자 이름을 세션에 저장하고 꺼내서 쓰는 메서드
+     //CONNECT 시 accessor 에 저장해둔 authenticaiton 이 이후의 SUBSCRIBE,CONNECT 등 값이 파싱이 안돼서 세션에도 따로 저장해서 쓰도록함
+    private void createUserSession(Authentication authentication,StompHeaderAccessor accessor){
+        var principal = (StompPrincipal) authentication.getPrincipal();
+        accessor.getSessionAttributes().put("username", principal.getUserId());
+    }
+}

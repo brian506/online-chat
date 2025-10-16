@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.chat.domain.dto.request.CreateChatUserRequest;
 import org.chat.domain.dto.response.ChatUserResponse;
 import org.chat.domain.dto.response.DifferentUserResponse;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;

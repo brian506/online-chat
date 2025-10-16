@@ -3,9 +3,11 @@ package org.chat.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chat.domain.dto.request.CreateRoomRequest;
+import org.chat.domain.dto.response.RoomListResponse;
 import org.chat.domain.dto.response.RoomResponse;
 import org.chat.domain.dto.response.RoomUserResponse;
 import org.chat.domain.entity.Room;
+import org.chat.domain.entity.UserType;
 import org.chat.domain.service.RoomService;
 import org.chat.security.StompPrincipal;
 import org.common.utils.SuccessResponse;
@@ -28,10 +30,21 @@ public class RoomController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createRoom(@AuthenticationPrincipal StompPrincipal me,
                                         @RequestBody CreateRoomRequest request){
-        RoomUserResponse roomUserResponse = roomService.createRoom(me.getUserId(), request.targetId());
+        RoomUserResponse roomUserResponse = roomService.createPrivateRoom(me.getUserId(), request.targetId());
         log.info("createRoom me={}, target={}", me.getName(), request.targetId());
         SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",roomUserResponse);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    // 내 채팅방 목록 조회
+    @GetMapping("/my-rooms/{userId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getMyAsks(@PathVariable String userId,
+                                       @RequestParam UserType userType,
+                                       @RequestParam(required = false) String cursor){
+        RoomListResponse roomResponses = roomService.findRoomsByUsertype(userId,userType,cursor);
+        SuccessResponse response = new SuccessResponse(true,"내 채팅방 조회 성공",roomResponses);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
     // 별명으로 방 조회

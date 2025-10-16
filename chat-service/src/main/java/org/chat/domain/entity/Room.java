@@ -3,7 +3,6 @@ package org.chat.domain.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.chat.domain.dto.response.Participant;
 import org.chat.domain.dto.response.RoomResponse;
 import org.common.exception.custom.DataNotFoundException;
 import org.springframework.data.annotation.Id;
@@ -22,7 +21,7 @@ import java.util.List;
 @CompoundIndexes({
         @CompoundIndex(
                 name = "idx_part_user_type_last",
-                def = "{'participants.userId' : 1, 'participants.type' : 1 , 'last_message_at' : -1}"
+                def = "{'participants.user_id' : 1, 'participants.user_type' : 1 , 'last_message_at' : -1}"
         )
 }) // 질문 받은, 질문한 목록들을 (사용자ID + UserType)복합인덱스를 사용하여 최근 채팅순으로 조회 최적화
 public class Room  {
@@ -38,8 +37,8 @@ public class Room  {
     private List<Participant> participants;
 
     @Setter
-    @Field(name = "name")
-    private String name; // 채팅방 이름 (별명으로)
+    @Field(name = "room_name")
+    private String roomName; // 채팅방 이름 (별명으로)
 
     @Indexed(unique = true)
     @Field(name = "room_key")
@@ -63,8 +62,8 @@ public class Room  {
 
     public static RoomResponse toDto(Room room){
         return new RoomResponse(
-                room.id,
-                room.getName(),
+                room.getId(),
+                room.getRoomName(),
                 room.getParticipants(),
                 room.getRoomType(),
                 room.getCreatedAt(),
