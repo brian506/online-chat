@@ -30,7 +30,7 @@ public class ChatUser {
     private Gender gender;
 
     @Field(name = "username")
-    private String username;
+    private String username; // 실명
 
     @Field(name = "birth")
     private String birth;

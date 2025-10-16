@@ -3,7 +3,8 @@ package org.chat.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.chat.domain.dto.Sender;
+import org.chat.domain.dto.request.SendMessageRequest;
+import org.chat.domain.dto.response.MessageBroadcastResponse;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -25,19 +26,29 @@ public class Message  {
     @Field(name = "content")
     private String content;
 
-    @Field(name = "sender")
-    private Sender sender;
+    @Field(name = "sender_id")
+    private String senderId;
 
     @Field(name = "timestamp")
     private LocalDateTime timestamp;
 
-    public static Message saveMessage(Message message){
+    public static Message saveMessage(SendMessageRequest payload,String senderId){
        return Message.builder()
-                .roomId(message.getRoomId())
-                .content(message.getContent())
-                .sender(message.getSender())
-                .timestamp(LocalDateTime.now())
+               .roomId(payload.roomId())
+               .senderId(senderId)
+               .content(payload.content())
+               .timestamp(LocalDateTime.now())
                 .build();
+    }
+
+    public static MessageBroadcastResponse toDto(Message message){
+        return new MessageBroadcastResponse(
+                message.getId(),
+                message.getRoomId(),
+                message.getContent(),
+                message.getSenderId(),
+                message.getTimestamp()
+        );
     }
 }
 

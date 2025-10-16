@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class ChatRoomUserService {
+public class ChatRoomUserRedisService {
 
     /**
      * 방에 참여자 목록 위한 레디스

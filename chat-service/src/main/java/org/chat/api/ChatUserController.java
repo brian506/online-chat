@@ -42,10 +42,10 @@ public class ChatUserController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
     // 내 정보 조회
-    @GetMapping("/my-page/{nickname}")
+    @GetMapping("/my-page")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getMyInfo(@PathVariable String nickname){
-        ChatUserResponse userResponse = userService.getMyInfo(nickname);
+    public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal StompPrincipal me){
+        ChatUserResponse userResponse = userService.getMyInfo(me.getUserId());
         SuccessResponse response = new SuccessResponse(true,"내 정보 조회 성공",userResponse);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
