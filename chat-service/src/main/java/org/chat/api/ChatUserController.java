@@ -57,4 +57,5 @@ public class ChatUserController {
         SuccessResponse response = new SuccessResponse(true,"사용자 조회 성공",userResponse);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+
 }
