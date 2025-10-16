@@ -41,8 +41,8 @@ public class ChatUserService {
     }
 
     // 내 정보 조회
-    public ChatUserResponse getMyInfo(final String nickname){
-        ChatUser user = OptionalUtil.getOrElseThrow(repository.findByNickname(nickname),"존재하지 않는 사용자입니다.");
+    public ChatUserResponse getMyInfo(final String userId){
+        ChatUser user = OptionalUtil.getOrElseThrow(repository.findById(userId),"존재하지 않는 사용자입니다.");
         return ChatUser.toDto(user);
     }
 

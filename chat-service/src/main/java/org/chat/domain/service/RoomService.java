@@ -3,7 +3,7 @@ package org.chat.domain.service;
 import com.mongodb.DuplicateKeyException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.chat.domain.dto.Participant;
+import org.chat.domain.dto.response.Participant;
 import org.chat.domain.dto.response.RoomResponse;
 import org.chat.domain.dto.response.RoomUserResponse;
 import org.chat.domain.entity.ChatUser;
@@ -12,11 +12,8 @@ import org.chat.domain.entity.UserType;
 import org.chat.domain.repository.ChatUserRepository;
 import org.chat.domain.repository.RoomRepository;
 import org.common.utils.OptionalUtil;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

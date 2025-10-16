@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/chat/rooms")
-public class ChatController {
+public class RoomController {
 
     private final RoomService roomService;
 

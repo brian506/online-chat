@@ -1,6 +1,5 @@
 package org.chat.domain.dto.response;
 
-import org.chat.domain.dto.Participant;
 import org.chat.domain.entity.RoomType;
 
 import java.time.LocalDateTime;

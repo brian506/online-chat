@@ -24,8 +24,8 @@ public class WebSocketSecurityConfig  {
 
         return messages
                 .nullDestMatcher().authenticated()                 // CONNECT 등 목적지 없는 프레임
-                .simpDestMatchers("/pub/**").authenticated()       // 클라 → 서버 전송
-                .simpSubscribeDestMatchers("/topic/**").authenticated() // 구독
+                .simpDestMatchers("/pub/**").hasAuthority("ROLE_GENERAL")      // 클라 → 서버 전송
+                .simpSubscribeDestMatchers("/topic/**").hasAuthority("ROLE_GENERAL")
                 .simpTypeMatchers(
                         SimpMessageType.CONNECT,
                         SimpMessageType.DISCONNECT,

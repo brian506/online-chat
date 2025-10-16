@@ -1,4 +1,4 @@
-package org.chat.domain.dto;
+package org.chat.domain.dto.response;
 
 import org.chat.domain.entity.UserType;
 
