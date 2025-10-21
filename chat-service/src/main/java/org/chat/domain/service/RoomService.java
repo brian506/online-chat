@@ -13,6 +13,7 @@ import org.chat.domain.entity.UserType;
 import org.chat.domain.repository.ChatUserRepository;
 import org.chat.domain.repository.RoomRepository;
 import org.chat.domain.repository.customRepository.RoomRepositoryCustom;
+import org.common.exception.custom.DataNotFoundException;
 import org.common.utils.ListUtil;
 import org.common.utils.OptionalUtil;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,6 @@ public class RoomService {
     public RoomUserResponse createPrivateRoom(String myUserId, String targetUserId) {
         Room room = createOrGetRoom(myUserId, targetUserId);
         String view = viewByRole(myUserId, room);
-        room.setRoomName(view); // 상대방의 이름 or 닉네임으로 방제목 생성
 
         // 채팅방 발행
         CreateRoomEvent roomEvent = CreateRoomEvent.of(room.getId(),myUserId,targetUserId);
@@ -47,24 +47,28 @@ public class RoomService {
 
 
     // 내 채팅방 목록
-    public RoomListResponse findRoomsByUsertype(final String userId, UserType userType, String cursor){
+    public RoomListResponse findRoomsByUsertype(final String userId, final UserType userType, final String cursor){
         List<Room> rooms = ListUtil.getOrElseThrowList(roomRepository.findRoomsByUserAndType(userId,userType,cursor),"채팅방이 존재하지 않습니다.");
         List<RoomResponse> responses = rooms.stream()
-                                            .map(Room::toDto)   // Room 엔티티 → RoomResponse
-                                            .toList();
-
+                .map(room -> {
+                    // 1. 요청자(userId) 관점에서 상대방 이름(닉네임 or 실명)을 계산
+                    String displayPeerName = viewByRole(userId, room);
+                    return Room.toDto(room, displayPeerName);
+                })
+                .toList();
+        log.info("내 채팅방 목록 조회 #### " + responses);
         String nextCursor =  rooms.get(rooms.size() - 1).getId(); // 페이지의 가장 마지막 커서 위치
         return new RoomListResponse(responses, nextCursor);
     }
 
     // 채팅방을 별명으로 검색(채팅방 목록에서)
-    public RoomResponse findRoomByName(final String nickname){
-        ChatUser user = OptionalUtil.getOrElseThrow(userRepository.findByNickname(nickname),"존재하지 않는 익명의 사용자입니다.");
-        Room room = OptionalUtil.getOrElseThrow(roomRepository.findByRoomName(user.getNickname()),"존재하지 않는 채팅방입니다.");
-        return Room.toDto(room);
+    public RoomResponse findRoomByName(final String myUserId, final String peerName){
+        Room room = OptionalUtil.getOrElseThrow(roomRepository.findRoomByParticipantId(myUserId,peerName),"존재하지 않는 채팅방입니다.");
+        String displayPeerName = viewByRole(myUserId,room);
+        return Room.toDto(room,displayPeerName);
     }
-    // 채팅방 삭제
 
+    // 채팅방 삭제
     public void deleteRoom(final String roomId){
         Room room = OptionalUtil.getOrElseThrow(roomRepository.findById(roomId),"존재하지 않는 채팅방입니다.");
         roomRepository.delete(room);
@@ -89,15 +93,16 @@ public class RoomService {
     }
 
     // 요청자 관점에서 상대 표시 (ASKER=실명, ANSWERER=닉네임)
+    // 채팅방 안에서 참여자들 중에 내가 질문자인지, 답변자인지에 따른 Participant 객체 반환
     private String viewByRole(String requesterUserId, Room room) {
 
         Participant askerUser = room.getParticipants().stream()
                 .filter(p -> p.userId().equals(requesterUserId))
-                .findFirst().orElseThrow();
+                .findFirst().orElseThrow(() -> new DataNotFoundException("채팅방 참여자 정보가 없습니다."));
 
         Participant answererUser = room.getParticipants().stream()
                 .filter(p -> !p.userId().equals(requesterUserId))
-                .findFirst().orElseThrow();
+                .findFirst().orElseThrow(() -> new DataNotFoundException("상대방 정보가 없습니다."));
 
         if (askerUser.userType() == UserType.ASKER) {
             return answererUser.username();

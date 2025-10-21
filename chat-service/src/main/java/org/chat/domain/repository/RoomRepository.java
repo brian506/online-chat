@@ -10,6 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface RoomRepository extends MongoRepository<Room,String>, RoomRepositoryCustom {
-    Optional<Room> findByRoomName(String roomName);
     Optional<Room> findByRoomKey(String roomKey);
 }

@@ -7,6 +7,7 @@ import org.chat.domain.dto.request.SendMessageEvent;
 import org.chat.domain.dto.response.MessageBroadcastResponse;
 import org.chat.domain.entity.Message;
 import org.chat.domain.repository.MessageRepository;
+import org.chat.security.StompPrincipal;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +32,8 @@ public class PublishService {
     }
 
     // 메시지 발행
-    public void sendMessage(final SendMessageEvent event, Principal sender){
-        MessageBroadcastResponse response = messageService.createMessage(event,sender);
+    public void sendMessage(final SendMessageEvent event,String senderId){
+        MessageBroadcastResponse response = messageService.createMessage(event,senderId);
         messagingTemplate.convertAndSend(MESSAGE_DEST_URL + response.roomId(),response);
     }
 
