@@ -33,13 +33,13 @@ public class RoomController {
         RoomUserResponse roomUserResponse = roomService.createPrivateRoom(me.getUserId(), request.targetId());
         log.info("createRoom me={}, target={}", me.getName(), request.targetId());
         SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",roomUserResponse);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 내 채팅방 목록 조회
     @GetMapping("/my-rooms/{userId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getMyAsks(@PathVariable String userId,
+    public ResponseEntity<?> getMyRooms(@PathVariable String userId,
                                        @RequestParam UserType userType,
                                        @RequestParam(required = false) String cursor){
         RoomListResponse roomResponses = roomService.findRoomsByUsertype(userId,userType,cursor);
@@ -49,12 +49,13 @@ public class RoomController {
 
     // 별명으로 방 조회
     // todo 그냥 키워드로 방 조회
-    @GetMapping("/{nickname}")
+    @GetMapping("/search")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> findRoom(@PathVariable String nickname){
-        RoomResponse room = roomService.findRoomByName(nickname);
+    public ResponseEntity<?> findRoom(@AuthenticationPrincipal StompPrincipal me,
+                                      @RequestParam("name") String name){
+        RoomResponse room = roomService.findRoomByName(me.getUserId(),name);
         SuccessResponse response = new SuccessResponse(true,"별명으로 채팅방 조회 성공",room);
-        return new ResponseEntity<>(response,HttpStatus.FOUND);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
     // 방 삭제

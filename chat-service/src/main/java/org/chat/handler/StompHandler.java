@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chat.security.JwtUtil;
 import org.chat.security.StompPrincipal;
+import org.common.exception.custom.DataNotFoundException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Component;
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtUtil jwtUtil;
+    private static final String USER_ID_KEY = "stompUserId";
+
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -40,21 +43,15 @@ public class StompHandler implements ChannelInterceptor {
             String token = authHeader.substring(7);
 
             Authentication authentication = jwtUtil.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            accessor.setUser(authentication);
-            //  이후 프레임에서도 userId 값 추출하기 위해
-            createUserSession(authentication,accessor);
+            var principal = (StompPrincipal) authentication.getPrincipal();
+            accessor.setUser(principal);
+            // 다른 프레임에서도 해당 인증 객체를 사용하기 위해 세션에 저장해둠
+            accessor.getSessionAttributes().put(USER_ID_KEY, principal.getUserId());
+
             accessor.setLeaveMutable(true);
             log.info("✅ STOMP CONNECT 인증 성공: user={}", authentication.getName());
         }
         return message;
     }
 
-
-     //사용자 이름을 세션에 저장하고 꺼내서 쓰는 메서드
-     //CONNECT 시 accessor 에 저장해둔 authenticaiton 이 이후의 SUBSCRIBE,CONNECT 등 값이 파싱이 안돼서 세션에도 따로 저장해서 쓰도록함
-    private void createUserSession(Authentication authentication,StompHeaderAccessor accessor){
-        var principal = (StompPrincipal) authentication.getPrincipal();
-        accessor.getSessionAttributes().put("username", principal.getUserId());
-    }
 }

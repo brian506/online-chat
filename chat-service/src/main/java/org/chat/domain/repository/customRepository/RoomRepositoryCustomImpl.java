@@ -11,17 +11,19 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class RoomRepositoryCustomImpl implements RoomRepositoryCustom{
 
     private final MongoTemplate mongoTemplate;
 
+
+    // 사용자의 질문자/답변자 화면에 따른 채팅방 목록 조회
     @Override
     public List<Room> findRoomsByUserAndType(String userId, UserType userType, String cursor) {
-        // 1. 기본 쿼리 객체 생성
-        Query query = new Query();
 
+        Query query = new Query();
         // 2. 핵심 조건: participants 배열 내부 검색 ($elemMatch)
         Criteria userCriteria = Criteria.where("user_id").is(userId)
                 .and("user_type").is(userType);
@@ -40,5 +42,30 @@ public class RoomRepositoryCustomImpl implements RoomRepositoryCustom{
 
         // 5. 쿼리 실행
         return mongoTemplate.find(query, Room.class);
+    }
+
+    // 사용자의 채팅방 목록에서 상대방 이름 or 닉네임 조회
+    // 답변,질문할 때 상대방 정보가 다르게 닉네임,이름이 보여지게 해야함
+    @Override
+    public Optional<Room> findRoomByParticipantId(String userId, String peerName) {
+
+        // 내 userId 불러들임
+        Criteria myCriteria = Criteria.where("user_id").is(userId);
+
+        Criteria peerCriteria = new Criteria().andOperator(
+                Criteria.where("user_id").ne(userId), // 나는 제외 조건
+                new Criteria().orOperator(
+                        Criteria.where("username").is(peerName),
+                        Criteria.where("nickname").is(peerName)
+                )
+        );
+        Query query = new Query(
+                new Criteria().andOperator(
+                        Criteria.where("participants").elemMatch(myCriteria),
+                        Criteria.where("participants").elemMatch(peerCriteria)
+                )
+        );
+        Room room = mongoTemplate.findOne(query,Room.class);
+        return Optional.of(room);
     }
 }

@@ -36,10 +36,6 @@ public class Room  {
     @Field(name = "participants") // 질문자,답변자 등 정보(실명,닉네임)
     private List<Participant> participants;
 
-    @Setter
-    @Field(name = "room_name")
-    private String roomName; // 채팅방 이름 (별명으로)
-
     @Indexed(unique = true)
     @Field(name = "room_key")
     private String roomKey; // 중복 생성 방지
@@ -60,14 +56,14 @@ public class Room  {
                 .build();
     }
 
-    public static RoomResponse toDto(Room room){
+    public static RoomResponse toDto(Room room,String peerName){
         return new RoomResponse(
                 room.getId(),
-                room.getRoomName(),
                 room.getParticipants(),
                 room.getRoomType(),
                 room.getCreatedAt(),
-                room.getLastMessageAt()
+                room.getLastMessageAt(),
+                peerName // 채팅방에서 보여질 상대방의 이름 or 닉네임
         );
     }
 
