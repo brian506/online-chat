@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface ChatUserRepository extends MongoRepository<ChatUser,String> {
-    Optional<ChatUser> findByNickname(String nickname);
+
     boolean existsByNickname(String nickname);
     Optional<ChatUser> findByUsername(String username);
 }

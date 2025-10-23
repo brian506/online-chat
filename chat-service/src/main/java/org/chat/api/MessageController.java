@@ -1,35 +1,41 @@
 package org.chat.api;
 
+import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.chat.domain.dto.request.SendMessageEvent;
-import org.chat.domain.service.PublishService;
-import org.chat.security.StompPrincipal;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.stereotype.Controller;
+import org.chat.domain.dto.response.MessageListResponse;
+import org.chat.domain.dto.response.MessageResponse;
+import org.chat.domain.service.MessageService;
+import org.common.utils.SuccessResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import java.util.List;
 
-@Slf4j
-@Controller
 @RequiredArgsConstructor
+@RequestMapping("/chat/message")
+@RestController
 public class MessageController {
 
-    private final PublishService publishService;
-    private static final String USER_ID_KEY = "stompUserId";
+    private final MessageService messageService;
 
-    //  "/pub/sendMessage" 경로로 클라이언트가 메시지 보냄
-    @MessageMapping("/sendMessage") // 서버에서 메시지 수신
-    public void sendMessage(@Payload SendMessageEvent event,
-                            StompHeaderAccessor accessor){
-        String userId =(String) accessor.getSessionAttributes().get(USER_ID_KEY);
-        publishService.sendMessage(event,userId);
+    // 채팅방의 대화 내용 조회 - List 기반
+//    @GetMapping("/{roomId}")
+//    @PreAuthorize("isAuthenticated()")
+//    public ResponseEntity<?> getMessagesFromRoom(@PathVariable String roomId) {
+//        List<MessageResponse> messageResponses = messageService.getMessagesFromRoom(roomId);
+//        SuccessResponse response = new SuccessResponse(true,"채팅방 메시지 불러오기 성공",messageResponses);
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
+
+    // 채팅방의 대화 내용 조회 - cursor 기반
+    @GetMapping("/{roomId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getMessagesFromRoom(@PathVariable String roomId,
+                                                 @RequestParam(required = false) String cursor){
+        MessageListResponse messageResponses = messageService.getMessagesFromRoomCursor(roomId,cursor);
+        SuccessResponse response = new SuccessResponse(true,"채팅방 메시지 불러오기 성공",messageResponses);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
-
-    // 입장 알림 이벤트
 }
-/**
- * Http 가 아닌 STOMP 메시징인 @Authentication 의 StompPrincipal 을 읽지 못하므로 그냥 authentication(setUser) 에 등록된 Principal 을 가져다 씀
- */
