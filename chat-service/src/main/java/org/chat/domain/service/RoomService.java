@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chat.domain.dto.request.CreateRoomEvent;
 import org.chat.domain.dto.response.RoomListResponse;
-import org.chat.domain.entity.Participant;
+import org.chat.domain.entity.*;
 import org.chat.domain.dto.response.RoomResponse;
 import org.chat.domain.dto.response.RoomUserResponse;
-import org.chat.domain.entity.ChatUser;
-import org.chat.domain.entity.Room;
-import org.chat.domain.entity.UserType;
 import org.chat.domain.repository.ChatUserRepository;
+import org.chat.domain.repository.MessageRepository;
 import org.chat.domain.repository.RoomRepository;
 import org.chat.domain.repository.customRepository.RoomRepositoryCustom;
 import org.common.exception.custom.DataNotFoundException;
@@ -30,6 +28,7 @@ import java.util.List;
 public class RoomService {
 
     private final RoomRepository roomRepository;
+    private final MessageRepository messageRepository;
     private final ChatUserRepository userRepository;
     private final PublishService publishService;
 
@@ -71,6 +70,7 @@ public class RoomService {
     // 채팅방 삭제
     public void deleteRoom(final String roomId){
         Room room = OptionalUtil.getOrElseThrow(roomRepository.findById(roomId),"존재하지 않는 채팅방입니다.");
+        messageRepository.deleteByRoomId(roomId); // message 을 찾지 않고 바로 메시지 전부 삭제
         roomRepository.delete(room);
     }
 

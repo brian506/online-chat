@@ -19,7 +19,7 @@ public class RoomRepositoryCustomImpl implements RoomRepositoryCustom{
     private final MongoTemplate mongoTemplate;
 
 
-    // 사용자의 질문자/답변자 화면에 따른 채팅방 목록 조회
+    // 사용자의 질문자/답변자 화면에 따른 채팅방 목록 조회(커서 기반)
     @Override
     public List<Room> findRoomsByUserAndType(String userId, UserType userType, String cursor) {
 

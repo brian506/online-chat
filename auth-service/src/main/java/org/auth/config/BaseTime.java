@@ -26,4 +26,5 @@ public class BaseTime {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @LastModifiedDate
     private LocalDateTime modifiedAt;
+
 }

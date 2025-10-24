@@ -7,6 +7,7 @@ public record MessageBroadcastResponse(
         String roomId,
         String content,
         String senderId,
+        String clientMsgId,
         LocalDateTime timeStamp
 ) {
 }

@@ -36,6 +36,9 @@ jwt:
     expiration: 1209600000 # 14일
     header: Authorization-refresh
 
+auth-service:
+  url: http://localhost:19091
+
 logging:
   level:
     org.springframework.web: DEBUG

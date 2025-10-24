@@ -1,6 +1,7 @@
 package org.auth.domain.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @ToString
+@Builder
 public class Token  {
 
     @Id
@@ -22,4 +24,11 @@ public class Token  {
 
     private Role role;
 
+    public static Token toEntity(String userId,String refreshToken,Role role){
+        return Token.builder()
+                .userId(userId)
+                .refreshToken(refreshToken)
+                .role(role)
+                .build();
+    }
 }

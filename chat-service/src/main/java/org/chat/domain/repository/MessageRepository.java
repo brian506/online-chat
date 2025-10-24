@@ -1,17 +1,20 @@
 package org.chat.domain.repository;
 
 import org.chat.domain.entity.Message;
+import org.chat.domain.repository.customRepository.MessageRepositoryCustom;
 import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MessageRepository extends MongoRepository<Message,String> {
+public interface MessageRepository extends MongoRepository<Message,String> , MessageRepositoryCustom {
 
-    Optional<Message> findByRoomIdOrderByTimestamp(String roomId);
+    List<Message> findByRoomId(String roomId);
+    void deleteByRoomId(String roomId);
 }
 

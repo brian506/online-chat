@@ -19,6 +19,7 @@ public class ChatUserService {
      * 채팅방에서는 사용자의 익명을 사용
      */
     private final ChatUserRepository repository;
+    private final CompletedUserService completedUserService;
 
     // 사용자 정보 입력 생성
     public String createUserInfo(final CreateChatUserRequest request,String email){
@@ -28,6 +29,7 @@ public class ChatUserService {
         }
         try{
             ChatUser user = ChatUser.toEntity(request,email);
+            completedUserService.addUserAsCompleted(user.getUserId());
             return repository.save(user).getNickname();
         }catch (DuplicateKeyException e) {
             // 동시에 같은 사용자가 닉네임을 중복처리했을 때 DB 단에서 유니크 제약 조건을 발동하기 위한 예외처리
@@ -50,5 +52,11 @@ public class ChatUserService {
     public DifferentUserResponse findUser(final String username){
         ChatUser user = OptionalUtil.getOrElseThrow(repository.findByUsername(username),"존재하지 않는 사용자입니다.");
         return ChatUser.toFindUserDto(user);
+    }
+
+    // 사용자 삭제 (탈퇴)
+    public void deleteUser(final String userId){
+        ChatUser user = OptionalUtil.getOrElseThrow(repository.findById(userId),"존재하지 않은 사용자입니다.");
+        repository.delete(user);
     }
 }

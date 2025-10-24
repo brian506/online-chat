@@ -9,7 +9,6 @@ import java.util.Optional;
 @Repository
 public interface TokenRepository extends CrudRepository<Token,String> {
 
-    Optional<Token> findByEmail(String email);
-
     Optional<Token> findByRefreshToken(String refreshToken);
+    void deleteByUserId(String userId);
 }
