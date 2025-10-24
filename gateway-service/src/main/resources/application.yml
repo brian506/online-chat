@@ -44,10 +44,15 @@ spring:
 
 
       routes:
-        - id: auth-service
+        - id: auth-login
           uri: lb://auth-service
           predicates:
             - Path=/oauth2/**
+        - id: auth-users
+          uri: lb://auth-service
+          predicates:
+            - Path=/users/**
+
         - id: chat-api
           uri: lb://chat-service
           predicates:

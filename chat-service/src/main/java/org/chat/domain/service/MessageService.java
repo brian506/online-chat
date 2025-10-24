@@ -49,12 +49,16 @@ public class MessageService {
     // 특정 채팅방에서 메시지들 조회 - cursor 방식
     public MessageListResponse getMessagesFromRoomCursor(final String roomId, final String cursor){
         List<Message> messages = messageRepository.getMessagesFromRoomId(roomId, cursor);
-        Collections.reverse(messages); // 가져온 데이터가 가장 최신순이기 때문에 최신순을 가장 아래에 보이게 하려면 정렬 순서를 뒤집어야함
+        // 다음 커서를 계산한 후에 뒤집기
         String nextCursor = messages.get(messages.size() - 1).getId();
+        Collections.reverse(messages); // 가져온 데이터가 가장 최신순이기 때문에 최신순을 가장 아래에 보이게 하려면 정렬 순서를 뒤집어야함
 
         List<MessageResponse> messageResponses = messages.stream()
                 .map(Message::toDtoFromRoom)
                 .toList();
         return new MessageListResponse(messageResponses,nextCursor);
     }
+
+
+
 }

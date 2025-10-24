@@ -15,5 +15,6 @@ import java.util.Optional;
 public interface MessageRepository extends MongoRepository<Message,String> , MessageRepositoryCustom {
 
     List<Message> findByRoomId(String roomId);
+    void deleteByRoomId(String roomId);
 }
 
