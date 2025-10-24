@@ -41,7 +41,7 @@ public class LoginService {
         String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(userId, new Date()));
         log.info("저장된 엑세스 토큰 : " + accessToken);
         // refreshToken 레디스에 저장, 쿠키로 변환은 컨트롤러에서
-        Token token = new Token(userId,refreshToken,Role.GENERAL);
+        Token token = Token.toEntity(userId,refreshToken,Role.GENERAL);
         tokenRepository.save(token);
 
         return new LoginResponse(Role.GENERAL, accessToken, refreshToken);

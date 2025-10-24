@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/oauth2/callback/google/**").permitAll()
                         .requestMatchers("/users/batch-status").permitAll()
+                        .requestMatchers("/users/logout").hasAuthority("ROLE_GENERAL")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.auth.domain.entity.LoginStatus;
 import org.auth.domain.entity.User;
 import org.auth.domain.repository.UserRepository;
+import org.auth.domain.repository.redis.TokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +16,13 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
 
     // PENDING -> ACTIVE 로 변경 배치 활성화
-    @Transactional
     public void activateUsersBatch(List<UUID> userIds){
         if(userIds.isEmpty() || userIds == null){
             return;
@@ -39,8 +41,8 @@ public class UserService {
             log.warn("배치 실패");
         }
     }
+
     // 유효시간이 지난 사용자 삭제
-    @Transactional
     public void deleteExpiredUsers(){
         List<User> expired = userRepository.findExpiredPendingUsers(LocalDateTime.now());
         if(!expired.isEmpty()){
@@ -48,4 +50,10 @@ public class UserService {
             userRepository.deleteAll(expired);
         }
     }
+
+    // 로그아웃
+    public void logout(final String userId){
+        tokenRepository.deleteByUserId(userId);
+    }
+
 }
