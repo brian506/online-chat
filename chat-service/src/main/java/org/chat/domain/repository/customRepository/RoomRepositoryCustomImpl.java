@@ -1,6 +1,7 @@
 package org.chat.domain.repository.customRepository;
 
 
+import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.chat.domain.entity.Room;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,5 +69,22 @@ public class RoomRepositoryCustomImpl implements RoomRepositoryCustom{
         );
         Room room = mongoTemplate.findOne(query,Room.class);
         return Optional.of(room);
+    }
+
+    // 마지막읽은메시지Id 필드값만 프론트에서 받은 id 값으로 update
+    @Override
+    public boolean updateLastReadMessageId(String roomId, String userId, String messageId) {
+
+        Query query = new Query(Criteria.where("_id").is(roomId)
+                .and("participants.user_id").is(userId));
+
+        // participants 배열 내 특정 사용자의 lastReadMessageId 필드만 업데이트
+        Update update = new Update().set("participants.$.last_read_message_id", messageId);
+
+        // 업데이트 실행
+        UpdateResult result = mongoTemplate.updateFirst(query, update, Room.class);
+
+        // 업데이트 성공 여부 반환 (변경된 문서가 1개 이상이면 성공)
+        return result.getModifiedCount() > 0;
     }
 }

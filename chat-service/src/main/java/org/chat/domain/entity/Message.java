@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.chat.domain.dto.request.SendMessageEvent;
 import org.chat.domain.dto.response.MessageBroadcastResponse;
+import org.chat.domain.dto.response.MessageReadResponse;
 import org.chat.domain.dto.response.MessageResponse;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -42,7 +43,7 @@ public class Message  {
                 .build();
     }
 
-    public static MessageBroadcastResponse toDto(Message message,String clientMsgId){
+    public static MessageBroadcastResponse toBroadCastResponse(Message message, String clientMsgId){
         return new MessageBroadcastResponse(
                 message.getId(),
                 message.getRoomId(),
@@ -53,7 +54,7 @@ public class Message  {
         );
     }
 
-    public static MessageResponse toDtoFromRoom(Message message){
+    public static MessageResponse toRoomResponse(Message message){
         return new MessageResponse(
                 message.getId(),
                 message.getRoomId(),
@@ -62,5 +63,6 @@ public class Message  {
                 message.getTimestamp()
         );
     }
+
 }
 

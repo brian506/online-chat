@@ -2,17 +2,15 @@ package org.chat.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.chat.domain.dto.request.CreateReadMessageEvent;
 import org.chat.domain.dto.request.CreateRoomEvent;
 import org.chat.domain.dto.request.SendMessageEvent;
 import org.chat.domain.dto.response.MessageBroadcastResponse;
-import org.chat.domain.entity.Message;
-import org.chat.domain.repository.MessageRepository;
-import org.chat.security.StompPrincipal;
+import org.chat.domain.dto.response.MessageReadResponse;
+import org.chat.domain.entity.Room;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +18,6 @@ import java.security.Principal;
 @Transactional
 public class PublishService {
 
-    private final MessageService messageService;
     private final SimpMessagingTemplate messagingTemplate;
     private final String MESSAGE_DEST_URL = "/topic/chat/room/";
     private final String ROOM_DEST_URL = "/topic/rooms/";
@@ -32,9 +29,12 @@ public class PublishService {
     }
 
     // 메시지 발행
-    public void sendMessage(final SendMessageEvent event,String senderId){
-        MessageBroadcastResponse response = messageService.createMessage(event,senderId);
+    public void publishMessage(final MessageBroadcastResponse response){
         messagingTemplate.convertAndSend(MESSAGE_DEST_URL + response.roomId(),response);
     }
 
+    // 읽은 메시지 표시 발행
+    public void publishMessageRead(final MessageReadResponse response){
+        messagingTemplate.convertAndSend(ROOM_DEST_URL + response.roomId(),response);
+    }
 }

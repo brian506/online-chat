@@ -2,7 +2,8 @@ package org.chat.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import org.chat.domain.dto.request.CreateReadMessageEvent;
+import org.chat.domain.dto.response.MessageReadResponse;
 import org.chat.domain.dto.response.RoomResponse;
 import org.common.exception.custom.DataNotFoundException;
 import org.springframework.data.annotation.Id;
@@ -43,8 +44,6 @@ public class Room  {
     @Field(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Field(name = "last_message_at")
-    private LocalDateTime lastMessageAt;
 
     public static Room ofPrivateRoom(Participant asker, Participant answerer) {
         return Room.builder()
@@ -52,18 +51,24 @@ public class Room  {
                 .participants(List.of(asker, answerer))
                 .roomKey(directionalKey(asker.userId(),answerer.userId()))
                 .createdAt(LocalDateTime.now())
-                .lastMessageAt(LocalDateTime.now())
                 .build();
     }
 
-    public static RoomResponse toDto(Room room,String peerName){
+    public static RoomResponse toRoomResponse(Room room, String peerName){
         return new RoomResponse(
                 room.getId(),
                 room.getParticipants(),
                 room.getRoomType(),
                 room.getCreatedAt(),
-                room.getLastMessageAt(),
                 peerName // 채팅방에서 보여질 상대방의 이름 or 닉네임
+        );
+    }
+
+    public static MessageReadResponse toReadResponse(CreateReadMessageEvent event){
+        return new MessageReadResponse(
+                event.roomId(),
+                event.userId(),
+                event.messageId()
         );
     }
 
