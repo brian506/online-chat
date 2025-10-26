@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface RoomRepositoryCustom {
      List<Room> findRoomsByUserAndType(String userId, UserType userType, String cursor);
      Optional<Room> findRoomByParticipantId(String userId,String peerId);
+     boolean updateLastReadMessageId(String roomId,String userId, String messageId);
 }

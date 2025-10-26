@@ -2,8 +2,12 @@ package org.chat.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.chat.domain.dto.request.CreateReadMessageEvent;
 import org.chat.domain.dto.request.SendMessageEvent;
+import org.chat.domain.dto.response.MessageReadResponse;
+import org.chat.domain.service.MessageService;
 import org.chat.domain.service.PublishService;
+import org.chat.domain.service.RoomService;
 import org.chat.security.StompPrincipal;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -18,17 +22,23 @@ import java.security.Principal;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class MessagePublishController {
+public class PublishController {
 
-    private final PublishService publishService;
+    private final MessageService messageService;
+    private final RoomService roomService;
     private static final String USER_ID_KEY = "stompUserId";
 
     //  "/pub/sendMessage" 경로로 클라이언트가 메시지 보냄
-    @MessageMapping("/sendMessage") // 서버에서 메시지 수신
+    @MessageMapping("/send/message") // 서버에서 메시지 수신
     public void sendMessage(@Payload SendMessageEvent event,
                             StompHeaderAccessor accessor){
-        String userId =(String) accessor.getSessionAttributes().get(USER_ID_KEY);
-        publishService.sendMessage(event,userId);
+        String senderId =(String) accessor.getSessionAttributes().get(USER_ID_KEY);
+        messageService.createMessage(event,senderId);
+    }
+
+    @MessageMapping("/mark/read-message")
+    public void sendReadMessage(@Payload CreateReadMessageEvent event){
+        roomService.updateToRead(event);
     }
 
     // 입장 알림 이벤트

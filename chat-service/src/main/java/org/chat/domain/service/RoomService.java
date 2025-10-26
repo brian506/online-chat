@@ -2,7 +2,9 @@ package org.chat.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.chat.domain.dto.request.CreateReadMessageEvent;
 import org.chat.domain.dto.request.CreateRoomEvent;
+import org.chat.domain.dto.response.MessageReadResponse;
 import org.chat.domain.dto.response.RoomListResponse;
 import org.chat.domain.entity.*;
 import org.chat.domain.dto.response.RoomResponse;
@@ -10,12 +12,9 @@ import org.chat.domain.dto.response.RoomUserResponse;
 import org.chat.domain.repository.ChatUserRepository;
 import org.chat.domain.repository.MessageRepository;
 import org.chat.domain.repository.RoomRepository;
-import org.chat.domain.repository.customRepository.RoomRepositoryCustom;
 import org.common.exception.custom.DataNotFoundException;
 import org.common.utils.ListUtil;
 import org.common.utils.OptionalUtil;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +51,7 @@ public class RoomService {
                 .map(room -> {
                     // 1. 요청자(userId) 관점에서 상대방 이름(닉네임 or 실명)을 계산
                     String displayPeerName = viewByRole(userId, room);
-                    return Room.toDto(room, displayPeerName);
+                    return Room.toRoomResponse(room, displayPeerName);
                 })
                 .toList();
         log.info("내 채팅방 목록 조회 #### " + responses);
@@ -64,7 +63,17 @@ public class RoomService {
     public RoomResponse findRoomByName(final String myUserId, final String peerName){
         Room room = OptionalUtil.getOrElseThrow(roomRepository.findRoomByParticipantId(myUserId,peerName),"존재하지 않는 채팅방입니다.");
         String displayPeerName = viewByRole(myUserId,room);
-        return Room.toDto(room,displayPeerName);
+        return Room.toRoomResponse(room,displayPeerName);
+    }
+
+    // 메시지 읽음 표시
+    public void updateToRead(final CreateReadMessageEvent event) {
+        boolean isRead = roomRepository.updateLastReadMessageId(event.roomId(), event.userId(), event.messageId());
+        MessageReadResponse response = null;
+        if(isRead){
+            response = Room.toReadResponse(event);
+            publishService.publishMessageRead(response);
+        }
     }
 
     // 채팅방 삭제
