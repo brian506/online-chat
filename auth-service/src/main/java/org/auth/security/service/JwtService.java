@@ -4,13 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.auth.domain.entity.Token;
-import org.auth.security.dto.response.AccessTokenPayload;
-import org.auth.security.dto.response.RefreshTokenPayload;
+import org.auth.domain.dto.response.AccessTokenPayload;
+import org.auth.domain.dto.response.RefreshTokenPayload;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +49,7 @@ public class JwtService {
 
     public String createAccessToken(final AccessTokenPayload payload) {
         return Jwts.builder()
-                .setSubject(payload.userId())
+                .setSubject(String.valueOf(payload.userId()))
                 .claim("role", payload.role().getKey())
                 .claim("email",payload.email())
                 .setIssuer(issuer)
@@ -63,7 +61,7 @@ public class JwtService {
 
     public String createRefreshToken(final RefreshTokenPayload payload) {
         return Jwts.builder()
-                .setSubject(payload.userId())
+                .setSubject(String.valueOf(payload.userId()))
                 .setIssuer(issuer)
                 .setIssuedAt(payload.date())
                 .setExpiration(new Date(payload.date().getTime() + refreshKeyExpiration + 1000L))

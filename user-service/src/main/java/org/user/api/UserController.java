@@ -1,33 +1,29 @@
-package org.chat.api;
+package org.user.api;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.chat.domain.dto.request.CreateChatUserRequest;
-import org.chat.domain.dto.response.ChatUserResponse;
-import org.chat.domain.dto.response.DifferentUserResponse;
-import org.chat.security.StompPrincipal;
 import org.common.utils.SuccessResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.user.domain.dto.request.CreateUserRequest;
+import org.user.domain.dto.response.SignUpUserResponse;
+import org.user.domain.dto.response.UserResponse;
+import org.user.domain.service.UserService;
 
-@Slf4j
-@RestController
-@RequestMapping("/chat/users")
+@RequestMapping("/v1/api/users")
 @RequiredArgsConstructor
-public class ChatUserController {
+@RestController
+public class UserController {
 
-    private final ChatUserService userService;
+    private final UserService userService;
 
-    // 사용자 정보 입력 생성
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> createUserInfo(@AuthenticationPrincipal StompPrincipal me,
-                                            @RequestBody CreateChatUserRequest request){
-        String nickname = userService.createUserInfo(request, me.getUserId());
-        SuccessResponse response = new SuccessResponse(true,"사용자 정보 생성 성공",nickname);
+    // 회원가입
+    @PostMapping("/sign-up")
+    public ResponseEntity<?> createUserInfo(@RequestBody final CreateUserRequest request){
+        SignUpUserResponse userResponse = userService.createUserInfo(request);
+        SuccessResponse response = new SuccessResponse(true,"사용자 정보 생성 성공",userResponse);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -48,13 +44,4 @@ public class ChatUserController {
         SuccessResponse response = new SuccessResponse(true,"내 정보 조회 성공",userResponse);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
-    // 이름(실명)으로 다른 사용자 찾기
-    @GetMapping("/find-user")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> findUser(@RequestParam("username") String username){
-        DifferentUserResponse userResponse = userService.findUser(username);
-        SuccessResponse response = new SuccessResponse(true,"사용자 조회 성공",userResponse);
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-
 }

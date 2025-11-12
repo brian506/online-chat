@@ -9,7 +9,6 @@ import org.chat.domain.dto.response.RoomListResponse;
 import org.chat.domain.entity.*;
 import org.chat.domain.dto.response.RoomResponse;
 import org.chat.domain.dto.response.RoomUserResponse;
-import org.chat.domain.repository.ChatUserRepository;
 import org.chat.domain.repository.MessageRepository;
 import org.chat.domain.repository.RoomRepository;
 import org.common.exception.custom.DataNotFoundException;

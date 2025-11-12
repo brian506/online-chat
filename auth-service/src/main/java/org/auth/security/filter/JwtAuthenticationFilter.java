@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.auth.domain.entity.Role;
 import org.auth.domain.entity.Token;
-import org.auth.domain.entity.User;
-import org.auth.domain.repository.UserRepository;
+import org.auth.domain.entity.AuthUser;
+import org.auth.domain.repository.AuthUserRepository;
 import org.auth.domain.repository.redis.TokenRepository;
-import org.auth.security.dto.response.AccessTokenPayload;
+import org.auth.domain.dto.response.AccessTokenPayload;
 import org.auth.security.service.CookieService;
 import org.auth.security.service.JwtService;
 import org.common.utils.OptionalUtil;
@@ -36,12 +36,12 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final String NO_CHECK_URL = "/oauth2/callback/google/login";
+    private static final String NO_CHECK_URL = "/v1/api/auth/login";
 
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final CookieService cookieService;
-    private final UserRepository userRepository;
+    private final AuthUserRepository authUserRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -84,10 +84,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         Token token = tokenRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new JwtException("Redis에 존재하지 않거나 만료된 Refresh Token 입니다."));
-        User user = OptionalUtil.getOrElseThrow(userRepository.findByEmail(token.getUserId()),"존재하지 않는 사용자입니다.");
+        AuthUser authUser = OptionalUtil.getOrElseThrow(authUserRepository.findById(token.getUserId()),"존재하지 않는 사용자입니다.");
 
         String newAccessToken = jwtService.createAccessToken(
-                new AccessTokenPayload(token.getUserId(),user.getEmail(), Role.GENERAL, new Date())
+                new AccessTokenPayload(token.getUserId(), authUser.getEmail(), Role.GENERAL, new Date())
         );
 
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);

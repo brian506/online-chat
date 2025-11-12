@@ -8,6 +8,7 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RedisHash(value = "refresh_token",timeToLive = 604800) // 7일
@@ -18,17 +19,20 @@ import java.util.UUID;
 public class Token  {
 
     @Id
-    private String userId;
+    private UUID userId;
 
     private String refreshToken;
 
     private Role role;
 
-    public static Token toEntity(String userId,String refreshToken,Role role){
+    private LocalDateTime createdAt;
+
+    public static Token toEntity(AuthUser user, String token){
         return Token.builder()
-                .userId(userId)
-                .refreshToken(refreshToken)
-                .role(role)
+                .userId(user.getId())
+                .refreshToken(token)
+                .role(user.getRole())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
