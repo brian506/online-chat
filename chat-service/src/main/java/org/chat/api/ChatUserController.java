@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.chat.domain.dto.request.CreateChatUserRequest;
 import org.chat.domain.dto.response.ChatUserResponse;
 import org.chat.domain.dto.response.DifferentUserResponse;
-import org.chat.domain.service.ChatUserService;
 import org.chat.security.StompPrincipal;
 import org.common.utils.SuccessResponse;
 import org.springframework.http.HttpStatus;

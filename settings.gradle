@@ -7,3 +7,6 @@ include 'gateway-service'
 include 'common'
 include 'eureka-server'
 
+
+include 'Qboard-service'
+include 'user-service'
