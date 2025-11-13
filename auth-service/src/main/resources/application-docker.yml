@@ -13,7 +13,7 @@ spring:
 redis:
   refresh-token:
     host: refresh-token-redis # 'localhost' -> 'refresh-token-redis'
-    port: 6379              # Docker 내부 포트 6379 사용
+    port: 6379
     password: ${REDIS_PASSWORD}
 
 eureka:

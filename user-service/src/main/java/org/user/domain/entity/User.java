@@ -10,6 +10,8 @@ import org.user.config.BaseTime;
 import org.user.domain.dto.request.CreateUserRequest;
 import org.user.domain.dto.response.UserResponse;
 
+import java.util.UUID;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,7 +23,7 @@ public class User extends BaseTime {
 
     @Id
     @Column(name = "user_id",nullable = false,updatable = false)
-    private String id; // auth 에서 생성한 userId로 매핑
+    private UUID id; // auth 에서 생성한 userId로 매핑
 
     @Column(name = "nickname",nullable = false)
     private String nickname;
@@ -36,7 +38,7 @@ public class User extends BaseTime {
     @Enumerated(EnumType.STRING)
     private Job job;
 
-    public static User signUpDtoToEntity(CreateUserRequest request,String userId){
+    public static User signUpDtoToEntity(CreateUserRequest request,UUID userId){
         return User.builder()
                 .id(userId)
                 .nickname(request.nickname())

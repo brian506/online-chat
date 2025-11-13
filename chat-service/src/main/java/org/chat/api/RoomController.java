@@ -20,21 +20,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/chat/rooms")
+@RequestMapping("/v1/api/chat/rooms")
 public class RoomController {
 
     private final RoomService roomService;
 
-    // 방 생성
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> createRoom(@AuthenticationPrincipal StompPrincipal me,
-                                        @RequestBody CreateRoomRequest request){
-        RoomUserResponse roomUserResponse = roomService.createPrivateRoom(me.getUserId(), request.targetId());
-        log.info("createRoom me={}, target={}", me.getName(), request.targetId());
-        SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",roomUserResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//    // 방 생성
+//    @PostMapping
+//    @PreAuthorize("isAuthenticated()")
+//    public ResponseEntity<?> createRoom(@AuthenticationPrincipal StompPrincipal me,
+//                                        @RequestBody CreateRoomRequest request){
+//        RoomUserResponse roomUserResponse = roomService.createPrivateRoom(me.getUserId(), request.targetId());
+//        log.info("createRoom me={}, target={}", me.getName(), request.targetId());
+//        SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",roomUserResponse);
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
     // 내 채팅방 목록 조회
     @GetMapping("/my-rooms/{userId}")

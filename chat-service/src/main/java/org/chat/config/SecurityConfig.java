@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // CORS Preflight 요청 허용
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/chat-ws/**").permitAll()
-                        .requestMatchers("/chat/**").hasAuthority("ROLE_GENERAL")
+                        .requestMatchers("/v1/api/chat/**").hasAuthority("ROLE_GENERAL")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenVerificationFilter, UsernamePasswordAuthenticationFilter.class);

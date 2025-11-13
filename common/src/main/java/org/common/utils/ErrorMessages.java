@@ -16,7 +16,7 @@ public final class ErrorMessages {
 
     // 게시글 / 댓글 관련
     public static final String POST_NOT_FOUND = "존재하지 않는 게시글입니다.";
-    public static final String COMMENT_NOT_FOUND = "존재하지 않는 댓글입니다.";
+    public static final String COMMENT_NOT_FOUND = "존재하지 않는 답글입니다.";
     public static final String INVALID_POST_OWNER = "게시글 작성자만 수정 또는 삭제할 수 있습니다.";
 
     // 서버 / 요청 관련

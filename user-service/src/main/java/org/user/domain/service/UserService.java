@@ -12,6 +12,8 @@ import org.user.domain.dto.response.UserResponse;
 import org.user.domain.entity.User;
 import org.user.domain.repository.UserRepository;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -37,7 +39,7 @@ public class UserService {
     }
 
     // 내 정보 조회
-    public UserResponse getMyInfo(final String userId){
+    public UserResponse getMyInfo(final UUID userId){
         User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),"존재하지 않는 사용자입니다.");
         return User.userResponseToDto(user);
     }
@@ -48,7 +50,7 @@ public class UserService {
     }
 
     // 사용자 삭제 (탈퇴)
-    public void deleteUser(final String userId){
+    public void deleteUser(final UUID userId){
         User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),"존재하지 않은 사용자입니다.");
         userRepository.delete(user);
     }

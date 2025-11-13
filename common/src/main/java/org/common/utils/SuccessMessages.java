@@ -10,6 +10,9 @@ public final class SuccessMessages {
         public static final String USER_POSTS_RETRIEVE_SUCCESS = "사용자의 게시물 조회 완료";
         public static final String TITLE_POSTS_RETRIEVE_SUCCESS = "제목 조회 완료";
         public static final String ALL_POSTS_RETRIEVE_SUCCESS = "게시물 전체 조회 완료";
+        public static final String ANSWER_CREATE_SUCCESS = "답장 생성 완료";
+        public static final String ANSWER_DELETE_SUCCESS = "답장 삭제 완료";
+        public static final String ANSWER_RETRIEVE_SUCCESS = "답장 단일 조회 완료";
 
         //User
 

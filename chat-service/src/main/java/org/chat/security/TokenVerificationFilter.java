@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.common.exception.custom.JwtValidationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -54,8 +55,8 @@ public class TokenVerificationFilter extends OncePerRequestFilter {
             setAuthentication(accessToken);
             filterChain.doFilter(request,response);
         } catch (Exception e) {
-            log.warn("유효하지 않은 JWT 토큰입니다. URI: {}, Error: {}", request.getRequestURI(), e.getMessage());
             SecurityContextHolder.clearContext();
+            throw new JwtValidationException("유효하지 않은 JWT 토큰입니다.");
         }
 
     }
