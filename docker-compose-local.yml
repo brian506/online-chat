@@ -3,7 +3,7 @@ version: "3.9"
 services:
   mysql:
     image: mysql:8.0
-    container_name: auth-mysql
+    container_name: mysql-shared
     restart: always
     ports:
       - "3309:3306"
@@ -11,6 +11,9 @@ services:
       - .env.local
     environment:
       MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: qnect_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     networks:
       - eureka-network
     volumes:
@@ -113,7 +116,7 @@ services:
     container_name: auth-service
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: default
     env_file:
       - .env.local
     depends_on:
@@ -157,15 +160,37 @@ services:
     container_name: user-service
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: default
     env_file:
       - .env.local
     depends_on:
       eureka-server: { condition: service_healthy }
-      mongodb: { condition: service_healthy }
-    #      presence-user-redis: { condition: service_healthy }
+      mysql:
+        condition: service_healthy
     ports:
-      - "8081:8080"
+      - "8082:8080"
+    networks:
+      - eureka-network
+    restart: always
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+    command: [ "java", "-jar", "app.jar" ]
+
+  board-service:
+    build: ./board-service
+    container_name: board-service
+    environment:
+      TZ: Asia/Seoul
+      SPRING_PROFILES_ACTIVE: default
+    env_file:
+      - .env.local
+    depends_on:
+      eureka-server: { condition: service_healthy }
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8083:8080"
     networks:
       - eureka-network
     restart: always

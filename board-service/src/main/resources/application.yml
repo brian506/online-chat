@@ -1,0 +1,73 @@
+
+server:
+  port: 8083
+  address: 0.0.0.0
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 20
+      max-queue-capacity: 1000
+    max-connections: 10000
+    accept-count: 500
+    connection-timeout: 60000
+    keep-alive-timeout: 30000
+    max-http-header-size: 8192
+    max-keep-alive-requests: 100
+
+spring:
+  main:
+    web-application-type: servlet
+  application:
+    name: board-service
+  config:
+    import: "optional:file:.env[.properties]"
+  jackson:
+    time-zone: Asia/Seoul
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/board_db?serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.orm.jpa: DEBUG
+    org.springframework.transaction: debug
+    org.springframework.security: DEBUG
+
+redis:
+  refresh-token:
+    host: localhost
+    port: 6381
+    password: ${REDIS_PASSWORD}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
+jwt:
+  secretKey: ${JWT_KEY}
+  access:
+    expiration: 3600000 # 1시간
+    header: Authorization
+  refresh:
+    expiration: 1209600000 # 14일
+    header: Authorization-refresh
+

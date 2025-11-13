@@ -42,7 +42,7 @@ public class AuthUserService {
     }
 
     // 이메일 중복 검증
-    private boolean validateEmail(String email){
+    private boolean validateEmail(final String email){
         return !authUserRepository.validateEmail(email);
     }
 

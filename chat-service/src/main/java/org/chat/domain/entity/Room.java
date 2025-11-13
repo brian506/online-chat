@@ -31,6 +31,9 @@ public class Room  {
     @Id
     private String id;
 
+    @Field(name = "answer_id")
+    private String answerId;
+
     @Field(name = "room_type")
     private RoomType roomType;
 

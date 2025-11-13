@@ -3,6 +3,8 @@ package org.user.domain.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.UUID;
 
-public record UserResponse(String userId,String nickname,String birth) {
+
+public record UserResponse(UUID userId, String nickname, String birth) {
 }

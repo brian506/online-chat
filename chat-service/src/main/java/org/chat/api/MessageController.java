@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/chat/message")
+@RequestMapping("/v1/api/chat/message")
 @RestController
 public class MessageController {
 

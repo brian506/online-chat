@@ -1,4 +1,6 @@
 package org.user.domain.dto.response;
 
-public record AuthRegisterResponse(Long userId,String email) {
+import java.util.UUID;
+
+public record AuthRegisterResponse(UUID userId, String email) {
 }

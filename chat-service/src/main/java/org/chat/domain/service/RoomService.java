@@ -27,20 +27,19 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
-    private final ChatUserRepository userRepository;
     private final PublishService publishService;
 
 
 
-    public RoomUserResponse createPrivateRoom(String myUserId, String targetUserId) {
-        Room room = createOrGetRoom(myUserId, targetUserId);
-        String view = viewByRole(myUserId, room);
-
-        // 채팅방 발행
-        CreateRoomEvent roomEvent = CreateRoomEvent.of(room.getId(),myUserId,targetUserId);
-        publishService.publishRoomCreated(roomEvent);
-        return RoomUserResponse.of(room.getId(), view);
-    }
+//    public RoomUserResponse createPrivateRoom(String myUserId, String targetUserId) {
+//        Room room = createOrGetRoom(myUserId, targetUserId);
+//        String view = viewByRole(myUserId, room);
+//
+//        // 채팅방 발행
+//        CreateRoomEvent roomEvent = CreateRoomEvent.of(room.getId(),myUserId,targetUserId);
+//        publishService.publishRoomCreated(roomEvent);
+//        return RoomUserResponse.of(room.getId(), view);
+//    }
 
 
     // 내 채팅방 목록
@@ -85,20 +84,20 @@ public class RoomService {
     /**
      * 메서드 분리
      */
-    public Room createOrGetRoom(String askerId, String answererId) {
-        String roomKey = Room.directionalKey(askerId,answererId);
-
-        return roomRepository.findByRoomKey(roomKey).orElseGet(() -> {
-            ChatUser askerUser   = OptionalUtil.getOrElseThrow(userRepository.findById(askerId),    "존재하지 않는 사용자입니다.");
-            ChatUser answererUser = OptionalUtil.getOrElseThrow(userRepository.findById(answererId),"존재하지 않는 사용자입니다.");
-            // dto 변환
-            Participant asker    = Participant.asker(askerUser.getUserId(),   askerUser.getNickname(),   askerUser.getUsername());
-            Participant answerer = Participant.answerer(answererUser.getUserId(), answererUser.getNickname(), answererUser.getUsername());
-
-            Room newRoom = Room.ofPrivateRoom(asker,answerer);
-            return roomRepository.save(newRoom);
-        });
-    }
+//    public Room createOrGetRoom(String askerId, String answererId) {
+//        String roomKey = Room.directionalKey(askerId,answererId);
+//
+//        return roomRepository.findByRoomKey(roomKey).orElseGet(() -> {
+//            ChatUser askerUser   = OptionalUtil.getOrElseThrow(userRepository.findById(askerId),    "존재하지 않는 사용자입니다.");
+//            ChatUser answererUser = OptionalUtil.getOrElseThrow(userRepository.findById(answererId),"존재하지 않는 사용자입니다.");
+//            // dto 변환
+//            Participant asker    = Participant.asker(askerUser.getUserId(),   askerUser.getNickname(),   askerUser.getUsername());
+//            Participant answerer = Participant.answerer(answererUser.getUserId(), answererUser.getNickname(), answererUser.getUsername());
+//
+//            Room newRoom = Room.ofPrivateRoom(asker,answerer);
+//            return roomRepository.save(newRoom);
+//        });
+//    }
 
     // 요청자 관점에서 상대 표시 (ASKER=실명, ANSWERER=닉네임)
     // 채팅방 안에서 참여자들 중에 내가 질문자인지, 답변자인지에 따른 Participant 객체 반환
