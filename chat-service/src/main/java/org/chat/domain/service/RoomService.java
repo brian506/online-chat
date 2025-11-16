@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chat.domain.dto.request.CreateReadMessageEvent;
 import org.chat.domain.dto.request.CreateRoomEvent;
-import org.chat.domain.dto.response.MessageReadResponse;
-import org.chat.domain.dto.response.RoomListResponse;
+import org.chat.domain.dto.response.*;
 import org.chat.domain.entity.*;
-import org.chat.domain.dto.response.RoomResponse;
-import org.chat.domain.dto.response.RoomUserResponse;
 import org.chat.domain.repository.MessageRepository;
 import org.chat.domain.repository.RoomRepository;
 import org.common.exception.custom.DataNotFoundException;
@@ -21,28 +18,28 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class RoomService {
 
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
     private final PublishService publishService;
+    private final BoardServiceClient boardServiceClient;
 
+    public RoomUserResponse createPrivateRoom(String answerId) {
+        AnswerFromBoardResponse boardResponse = boardServiceClient.getBoardInfo(answerId);
+        Room room = createOrGetRoom(boardResponse);
+        String view = viewByRole(boardResponse.askerId(), room);
 
-
-//    public RoomUserResponse createPrivateRoom(String myUserId, String targetUserId) {
-//        Room room = createOrGetRoom(myUserId, targetUserId);
-//        String view = viewByRole(myUserId, room);
-//
-//        // 채팅방 발행
-//        CreateRoomEvent roomEvent = CreateRoomEvent.of(room.getId(),myUserId,targetUserId);
-//        publishService.publishRoomCreated(roomEvent);
-//        return RoomUserResponse.of(room.getId(), view);
-//    }
+        // 채팅방 발행
+        CreateRoomEvent roomEvent = CreateRoomEvent.of(room.getId(), boardResponse.askerId(), boardResponse.answererId());
+        publishService.publishRoomCreated(roomEvent);
+        return RoomUserResponse.of(room.getId(), view);
+    }
 
 
     // 내 채팅방 목록
+    @Transactional(readOnly = true)
     public RoomListResponse findRoomsByUsertype(final String userId, final UserType userType, final String cursor){
         List<Room> rooms = ListUtil.getOrElseThrowList(roomRepository.findRoomsByUserAndType(userId,userType,cursor),"채팅방이 존재하지 않습니다.");
         List<RoomResponse> responses = rooms.stream()
@@ -58,6 +55,7 @@ public class RoomService {
     }
 
     // 채팅방을 별명으로 검색(채팅방 목록에서)
+    @Transactional(readOnly = true)
     public RoomResponse findRoomByName(final String myUserId, final String peerName){
         Room room = OptionalUtil.getOrElseThrow(roomRepository.findRoomByParticipantId(myUserId,peerName),"존재하지 않는 채팅방입니다.");
         String displayPeerName = viewByRole(myUserId,room);
@@ -84,20 +82,17 @@ public class RoomService {
     /**
      * 메서드 분리
      */
-//    public Room createOrGetRoom(String askerId, String answererId) {
-//        String roomKey = Room.directionalKey(askerId,answererId);
-//
-//        return roomRepository.findByRoomKey(roomKey).orElseGet(() -> {
-//            ChatUser askerUser   = OptionalUtil.getOrElseThrow(userRepository.findById(askerId),    "존재하지 않는 사용자입니다.");
-//            ChatUser answererUser = OptionalUtil.getOrElseThrow(userRepository.findById(answererId),"존재하지 않는 사용자입니다.");
-//            // dto 변환
-//            Participant asker    = Participant.asker(askerUser.getUserId(),   askerUser.getNickname(),   askerUser.getUsername());
-//            Participant answerer = Participant.answerer(answererUser.getUserId(), answererUser.getNickname(), answererUser.getUsername());
-//
-//            Room newRoom = Room.ofPrivateRoom(asker,answerer);
-//            return roomRepository.save(newRoom);
-//        });
-//    }
+    public Room createOrGetRoom(AnswerFromBoardResponse response) {
+
+
+            // dto 변환
+            Participant asker    = Participant.asker(response.askerId(),response.askerNickname());
+            Participant answerer = Participant.answerer(response.answerId(),response.answererNickname());
+
+            Room newRoom = Room.ofPrivateRoom(response, asker, answerer);
+            return roomRepository.save(newRoom);
+
+    }
 
     // 요청자 관점에서 상대 표시 (ASKER=실명, ANSWERER=닉네임)
     // 채팅방 안에서 참여자들 중에 내가 질문자인지, 답변자인지에 따른 Participant 객체 반환
@@ -112,7 +107,7 @@ public class RoomService {
                 .findFirst().orElseThrow(() -> new DataNotFoundException("상대방 정보가 없습니다."));
 
         if (askerUser.userType() == UserType.ASKER) {
-            return answererUser.username();
+            return answererUser.nickname();
         }
         return answererUser.nickname();
     }

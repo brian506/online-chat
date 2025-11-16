@@ -11,9 +11,7 @@ services:
       - .env.local
     environment:
       MYSQL_ROOT_HOST: '%'
-      MYSQL_DATABASE: qnect_db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
     networks:
       - eureka-network
     volumes:

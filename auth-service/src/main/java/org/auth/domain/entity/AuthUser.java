@@ -8,21 +8,22 @@ import org.auth.domain.dto.request.CreateUserRequest;
 import org.auth.domain.dto.response.CreateUserResponse;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.UUID;
+
 
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user")
+@Table(name = "auth_user")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Builder
 public class AuthUser extends BaseTime {
 
-    @Id @GeneratedValue
-    @Column(name = "user_id", nullable = false, updatable = false)
-    private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "auth_user_id", nullable = false, updatable = false,columnDefinition = "VARCHAR(36")
+    private String id;
 
     @Column(name = "email", nullable = false, updatable = false)
     private String email;

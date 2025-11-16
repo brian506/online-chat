@@ -2,7 +2,8 @@ package org.board.domain.dto.response;
 
 import org.board.domain.entity.BoardTopic;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 
-public record QuestionResponse(UUID questionId, BoardTopic boardTopic, String nickname, String tags, String jobs, String title, String content, int answerCount, int viewCount) {
+public record QuestionResponse(String questionId, BoardTopic boardTopic, String nickname, String tags, String jobs, String title, int answerCount, int viewCount, LocalDateTime createdAt) {
+
 }

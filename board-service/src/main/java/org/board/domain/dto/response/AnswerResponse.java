@@ -1,6 +1,7 @@
 package org.board.domain.dto.response;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 
-public record AnswerResponse(UUID answerId, UUID questionId, String writerId, String nickname, String tags, String jobs,String comment) {
+public record AnswerResponse(String answerId, String questionId, String answererId, String nickname, String tags, String jobs, String comment,
+                             LocalDateTime createdAt) {
 }

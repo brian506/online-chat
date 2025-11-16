@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 @RedisHash(value = "refresh_token",timeToLive = 604800) // 7일
 @AllArgsConstructor
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Token  {
 
     @Id
-    private UUID userId;
+    private String userId;
 
     private String refreshToken;
 

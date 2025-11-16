@@ -49,7 +49,7 @@ public class JwtService {
 
     public String createAccessToken(final AccessTokenPayload payload) {
         return Jwts.builder()
-                .setSubject(String.valueOf(payload.userId()))
+                .setSubject(payload.userId())
                 .claim("role", payload.role().getKey())
                 .claim("email",payload.email())
                 .setIssuer(issuer)
@@ -61,7 +61,7 @@ public class JwtService {
 
     public String createRefreshToken(final RefreshTokenPayload payload) {
         return Jwts.builder()
-                .setSubject(String.valueOf(payload.userId()))
+                .setSubject(payload.userId())
                 .setIssuer(issuer)
                 .setIssuedAt(payload.date())
                 .setExpiration(new Date(payload.date().getTime() + refreshKeyExpiration + 1000L))
