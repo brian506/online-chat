@@ -6,11 +6,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.UUID;
-
 @FeignClient(name = "board-service")
 public interface BoardServiceClient {
 
-    @GetMapping("/v1/api/answers/{answerId}")
-    AnswerFromBoardResponse getUser(@PathVariable UUID answerId);
+    @GetMapping("/v1/api/answers/chat-rooms/{answerId}")
+    AnswerFromBoardResponse getBoardInfo(@PathVariable String answerId);
 }

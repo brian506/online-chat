@@ -18,6 +18,7 @@ public final class SuccessMessages {
 
         public static final String SIGNUP_SUCCESS = "회원 등록 성공";
         public static final String LOGIN_SUCCESS = "로그인 성공";
+        public static final String PREFERENCE_POST_SUCCESS = "선호도 조사 입력 성공";
         public static final String PROFILE_UPDATE_SUCCESS = "회원 정보 수정 성공";
         public static final String USER_RETRIEVE_SUCCESS = "회원 조회 성공";
         public static final String USERNAME_RETRIEVE_SUCCESS = "회원이름으로 조회 성공";

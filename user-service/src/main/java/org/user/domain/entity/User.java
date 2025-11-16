@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.user.config.BaseTime;
 import org.user.domain.dto.request.CreateUserRequest;
+import org.user.domain.dto.request.UserPreferenceRequest;
 import org.user.domain.dto.response.UserResponse;
 
-import java.util.UUID;
+import java.time.LocalDate;
+
 
 @Entity
 @NoArgsConstructor
@@ -23,36 +25,45 @@ public class User extends BaseTime {
 
     @Id
     @Column(name = "user_id",nullable = false,updatable = false)
-    private UUID id; // auth 에서 생성한 userId로 매핑
+    private String id; // auth 에서 생성한 userId로 매핑
 
     @Column(name = "nickname",nullable = false)
     private String nickname;
 
     @Column(name = "birth",nullable = false)
-    private String birth;
+    private LocalDate birth;
 
-    @Column(name = "major")
-    private String major;
-
-    @Column(name = "job")
+    @Column(name = "gender")
     @Enumerated(EnumType.STRING)
-    private Job job;
+    private Gender gender;
 
-    public static User signUpDtoToEntity(CreateUserRequest request,UUID userId){
+    @Column(name = "level")
+    @Enumerated(EnumType.STRING)
+    private Level level; // 초급자,중급자,고급자
+
+    @Column(name = "prefer_taste")
+    @Enumerated(EnumType.STRING)
+    private Taste taste; // 맛 선호도
+
+    @Column(name = "grade")
+    @Enumerated(EnumType.STRING)
+    private Grade grade; // 서비스 내 등급
+
+    // 회원가입
+    public static User signUpDtoToEntity(CreateUserRequest request,String userId){
         return User.builder()
                 .id(userId)
                 .nickname(request.nickname())
                 .birth(request.birth())
-                .major(request.major())
-                .job(request.job())
+                .gender(request.gender())
+                .grade(Grade.NEWBIE) // 첫 회원가입시 뉴비
                 .build();
     }
 
-    public static UserResponse userResponseToDto(User user){
-        return new UserResponse(
-                user.getId(),
-                user.getNickname(),
-                user.getBirth()
-        );
+    // 선호도 조사
+    public void updatePreferences(UserPreferenceRequest request){
+        this.level = request.level();
+        this.taste = request.taste();
     }
+
 }

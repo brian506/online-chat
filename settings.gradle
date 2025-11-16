@@ -10,3 +10,5 @@ include 'eureka-server'
 
 include 'user-service'
 include 'board-service'
+include 'whisky-service'
+include 'notification-service'

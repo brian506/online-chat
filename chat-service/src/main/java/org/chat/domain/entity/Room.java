@@ -3,13 +3,12 @@ package org.chat.domain.entity;
 import lombok.Builder;
 import lombok.Getter;
 import org.chat.domain.dto.request.CreateReadMessageEvent;
+import org.chat.domain.dto.response.AnswerFromBoardResponse;
 import org.chat.domain.dto.response.MessageReadResponse;
 import org.chat.domain.dto.response.RoomResponse;
-import org.common.exception.custom.DataNotFoundException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -29,10 +28,7 @@ public class Room  {
     // todo 닉네임을 기준으로 복합인덱스 생성하여 조회 성능 향상
 
     @Id
-    private String id;
-
-    @Field(name = "answer_id")
-    private String answerId;
+    private String id; // 답변Id 로?
 
     @Field(name = "room_type")
     private RoomType roomType;
@@ -40,19 +36,15 @@ public class Room  {
     @Field(name = "participants") // 질문자,답변자 등 정보(실명,닉네임)
     private List<Participant> participants;
 
-    @Indexed(unique = true)
-    @Field(name = "room_key")
-    private String roomKey; // 중복 생성 방지
-
     @Field(name = "created_at")
     private LocalDateTime createdAt;
 
 
-    public static Room ofPrivateRoom(Participant asker, Participant answerer) {
+    public static Room ofPrivateRoom(AnswerFromBoardResponse response,Participant asker, Participant answerer) {
         return Room.builder()
+                .id(response.answerId())
                 .roomType(RoomType.PRIVATE)
                 .participants(List.of(asker, answerer))
-                .roomKey(directionalKey(asker.userId(),answerer.userId()))
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -75,10 +67,6 @@ public class Room  {
         );
     }
 
-    // 질문자 -> 답변자 순서 고정 생성
-    public static String directionalKey(String askerId,String answererId) {
-        if (answererId == null || askerId == null) throw new DataNotFoundException("질문자 혹은 답변자가 존재하지 않습니다.");
-        return askerId + "->" + answererId; // 방향성 유지!
-    }
+
 
 }

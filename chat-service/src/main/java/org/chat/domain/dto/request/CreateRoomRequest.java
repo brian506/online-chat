@@ -1,4 +1,4 @@
 package org.chat.domain.dto.request;
 
-public record CreateRoomRequest(String targetId) {
+public record CreateRoomRequest(String answerId) {
 }

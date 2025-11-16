@@ -36,7 +36,7 @@
 //    public void handleSubscribeEvent(SessionSubscribeEvent event) {
 //        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
 //        String roomId = accessor.getDestination().replace(ROOM_URL, "");
-//        StompPrincipal principal =(StompPrincipal) accessor.getUser();
+//        StompPrincipal principal =(StompPrincipal) accessor.getBoardInfo();
 //        ChatUser user = OptionalUtil.getOrElseThrow(userRepository.findByEmail(principal.getName()),"존재하지 않는 사용자입니다.");
 //        messagingTemplate.convertAndSend(ROOM_URL + roomId, user.getNickname() + "님이 입장하였습니다");
 //    }
@@ -45,7 +45,7 @@
 //    public void handleDisconnectEvent(SessionDisconnectEvent event) {
 //        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
 //        String roomId = accessor.getDestination().replace(ROOM_URL, "");
-//        StompPrincipal principal =(StompPrincipal) accessor.getUser();
+//        StompPrincipal principal =(StompPrincipal) accessor.getBoardInfo();
 //        ChatUser user = OptionalUtil.getOrElseThrow(userRepository.findByEmail(principal.getName()),"존재하지 않는 사용자입니다.");
 //        messagingTemplate.convertAndSend(ROOM_URL + roomId,
 //                user.getNickname() + "님이 퇴장했습니다.");
