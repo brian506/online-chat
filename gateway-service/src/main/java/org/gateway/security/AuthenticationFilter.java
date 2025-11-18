@@ -29,7 +29,8 @@ import reactor.core.publisher.Mono;
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     private final JwtUtil jwtUtil;
-    private final String LOGIN_URL = "/oauth2/callback/google/login";
+    private final String LOGIN_URL = "/v1/api/auth/login";
+    private final String SIGN_UP = "/v1/api/users/sign-up";
     private final String WEBSOCKET_URL = "/chat-ws";
 
     public AuthenticationFilter(JwtUtil jwtUtil) {
@@ -47,10 +48,15 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
             // login 경로는 다음 필터로 넘어감
             String path = request.getURI().getPath();
+            if (path.startsWith(SIGN_UP)) {
+                return chain.filter(exchange);
+            }
+
             if (path.startsWith(LOGIN_URL)) {
                 log.info(">>> Gateway AuthenticationFilter 로그인 요청 : {}", path);
                 return chain.filter(exchange);
             }
+
 
             // 헤더 존재 여부 확인
             String token = resolveToken(request);

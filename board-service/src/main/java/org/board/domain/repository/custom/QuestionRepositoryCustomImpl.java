@@ -5,9 +5,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
-import org.board.domain.dto.response.QuestionResponse;
-import org.board.domain.entity.BoardTopic;
+import org.board.domain.dto.response.BoardResponse;
+import org.board.domain.entity.Tags;
 import org.board.domain.entity.QQuestion;
 import org.board.domain.entity.SortType;
 import org.springframework.data.domain.Pageable;
@@ -30,9 +29,9 @@ public class QuestionRepositoryCustomImpl implements QuestionRepositoryCustom{
      * 질문 게시글을 WHERE,ORDER BY 동적 조건 생성
      */
     @Override
-    public Slice<QuestionResponse> getQuestionsByCursor(BoardTopic boardTopic, SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable) {
-        List<QuestionResponse> responses = queryFactory
-                .select(Projections.constructor(QuestionResponse.class,
+    public Slice<BoardResponse> getQuestionsByCursor(Tags tags, SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable) {
+        List<BoardResponse> responses = queryFactory
+                .select(Projections.constructor(BoardResponse.class,
                         question.id,
                         question.boardTopic,
                         question.askerNickname,
@@ -43,7 +42,7 @@ public class QuestionRepositoryCustomImpl implements QuestionRepositoryCustom{
                 ))
                 .from(question)
                 .where(
-                        question.boardTopic.eq(boardTopic),
+                        question.boardTopic.eq(tags),
                         ltCursor(sortType, cursorValue, cursorCreatedAt)
                 )
                 .orderBy(getOrderSpecifiers(sortType))

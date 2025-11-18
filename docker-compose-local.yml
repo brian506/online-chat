@@ -11,7 +11,7 @@ services:
       - .env.local
     environment:
       MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: root
     networks:
       - eureka-network
     volumes:
@@ -25,6 +25,8 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_general_ci
+      - --max_connections=100
+      - --innodb_buffer_pool_size=256M
     logging:
       driver: json-file
       options: { max-size: "10m", max-file: "3" }
@@ -43,9 +45,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-    logging:
-      driver: json-file
-      options: { max-size: "10m", max-file: "3" }
+
 
   mongodb:
     image: mongo:latest
@@ -72,7 +72,8 @@ services:
     container_name: eureka-server
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: local
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8761:8761"
     networks:
@@ -84,17 +85,15 @@ services:
       retries: 10
       start_period: 60s
     restart: always
-    logging:
-      driver: json-file
-      options: { max-size: "10m", max-file: "3" }
-    command: ["java", "-jar", "app.jar"]
+
 
   gateway-service:
     build: ./gateway-service
     container_name: gateway-service
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: local
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     env_file:
       - .env.local
     depends_on:
@@ -104,17 +103,16 @@ services:
     networks:
       - eureka-network
     restart: always
-    logging:
-      driver: json-file
-      options: { max-size: "10m", max-file: "3" }
-    command: ["java", "-jar", "app.jar"]
+
+
 
   auth-service:
     build: ./auth-service
     container_name: auth-service
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: local
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     env_file:
       - .env.local
     depends_on:
@@ -126,39 +124,34 @@ services:
     networks:
       - eureka-network
     restart: always
-    logging:
-      driver: json-file
-      options: { max-size: "10m", max-file: "3" }
-    command: ["java", "-jar", "app.jar"]
+
 
   chat-service:
     build: ./chat-service
     container_name: chat-service
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: local
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     env_file:
       - .env.local
     depends_on:
       eureka-server: { condition: service_healthy }
       mongodb: { condition: service_healthy }
-#      presence-user-redis: { condition: service_healthy }
     ports:
       - "8081:8080"
     networks:
       - eureka-network
     restart: always
-    logging:
-      driver: json-file
-      options: { max-size: "10m", max-file: "3" }
-    command: ["java", "-jar", "app.jar"]
+
 
   user-service:
     build: ./user-service
     container_name: user-service
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: local
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     env_file:
       - .env.local
     depends_on:
@@ -170,17 +163,15 @@ services:
     networks:
       - eureka-network
     restart: always
-    logging:
-      driver: json-file
-      options: { max-size: "10m", max-file: "3" }
-    command: [ "java", "-jar", "app.jar" ]
+
 
   board-service:
     build: ./board-service
     container_name: board-service
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: local
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     env_file:
       - .env.local
     depends_on:
@@ -192,11 +183,45 @@ services:
     networks:
       - eureka-network
     restart: always
-    logging:
-      driver: json-file
-      options: { max-size: "10m", max-file: "3" }
-    command: [ "java", "-jar", "app.jar" ]
 
+
+  whisky-service:
+    build: ./whisky-service
+    container_name: whisky-service
+    environment:
+      TZ: Asia/Seoul
+      SPRING_PROFILES_ACTIVE: local
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    env_file:
+      - .env.local
+    depends_on:
+      eureka-server: { condition: service_healthy }
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8084:8080"
+    networks:
+      - eureka-network
+    restart: always
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    environment:
+      TZ: Asia/Seoul
+      SPRING_PROFILES_ACTIVE: local
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    env_file:
+      - .env.local
+    depends_on:
+      eureka-server: { condition: service_healthy }
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8085:8080"
+    networks:
+      - eureka-network
+    restart: always
 
 volumes:
   mysql-data:

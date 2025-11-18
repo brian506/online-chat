@@ -19,6 +19,9 @@ public class WhiskyMetaData {
     @Column(name = "country")
     private String country;
 
+    @Column(name = "price")
+    private Double price;
+
     @Column(name = "bottler")
     private String bottler; // 예) 탈리스커
 
@@ -27,4 +30,7 @@ public class WhiskyMetaData {
 
     @Column(name = "abv")
     private Double abv; // 도수
+
+    @Column(name = "nose")
+    private String nose;
 }

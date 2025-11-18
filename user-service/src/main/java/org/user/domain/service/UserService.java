@@ -2,7 +2,6 @@ package org.user.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import org.common.exception.custom.ConflictException;
-import org.common.utils.ErrorMessages;
 import org.common.utils.OptionalUtil;
 import org.common.utils.SecurityUtil;
 import org.common.utils.SuccessMessages;
@@ -15,10 +14,10 @@ import org.user.domain.dto.response.AuthRegisterResponse;
 import org.user.domain.dto.response.SignUpUserResponse;
 import org.user.domain.dto.response.UserPreferenceResponse;
 import org.user.domain.dto.response.UserResponse;
+import org.user.domain.entity.Follow;
 import org.user.domain.entity.User;
+import org.user.domain.repository.FollowRepository;
 import org.user.domain.repository.UserRepository;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AuthServiceClient authService;
+    private final FollowRepository followRepository;
 
     // 회원가입
     @Transactional
@@ -57,8 +57,37 @@ public class UserService {
     // 내 정보 조회
     @Transactional(readOnly = true)
     public UserResponse getMyInfo(final String userId){
+        String loginUserId = SecurityUtil.getCurrentUserId();
         User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),"존재하지 않는 사용자입니다.");
-        return UserResponse.userResponseToDto(user);
+
+        long followerCount  = followRepository.countByFollower_Id(userId); // 팔로워수
+        long followingCount = followRepository.countByFollowing_Id(userId); // 팔로잉수
+        boolean followingByMe = followRepository
+                .existsByFollower_IdAndFollowing_Id(loginUserId, userId); // 내가 팔로잉 하는 사람인지
+
+        return UserResponse.userResponseToDto(user,followerCount,followingCount,followingByMe);
+    }
+
+    // 정보 조회 후 받은 userId 로 팔로잉 추가
+    @Transactional
+    public void followUser(final String userId){
+        String loginUserId = SecurityUtil.getCurrentUserId();
+        User loginUser = OptionalUtil.getOrElseThrow(userRepository.findById(loginUserId),SuccessMessages.USER_RETRIEVE_SUCCESS);
+        User targetUser = OptionalUtil.getOrElseThrow(userRepository.findById(userId),SuccessMessages.USER_RETRIEVE_SUCCESS);
+
+        if(!followRepository.existsByFollower_IdAndFollowing_Id(loginUser.getId(), targetUser.getId())){
+            throw new ConflictException("이미 팔로우한 사용자입니다.");
+        }
+        // todo 팔로잉 했을 때 팔로잉 당한 사람에게 알람
+        Follow follow = Follow.of(loginUser,targetUser);
+        followRepository.save(follow);
+    }
+
+    // 팔로잉 취소
+    @Transactional
+    public void unFollowUser(final String userId){
+        String loginUserId = SecurityUtil.getCurrentUserId();
+        followRepository.deleteByFollower_IdAndFollowing_Id(loginUserId,userId);
     }
 
     // 닉네임 중복 확인

@@ -15,12 +15,6 @@ spring:
   config:
     import: "optional:file:.env[.properties]"
 
-redis:
-  refresh-token:
-    host: refresh-token-redis
-    port: 6379
-    password: ${REDIS_PASSWORD}
-
 eureka:
   client:
     register-with-eureka: true

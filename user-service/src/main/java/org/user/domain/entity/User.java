@@ -9,9 +9,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.user.config.BaseTime;
 import org.user.domain.dto.request.CreateUserRequest;
 import org.user.domain.dto.request.UserPreferenceRequest;
-import org.user.domain.dto.response.UserResponse;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Entity
@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Builder
-@Table(name = "user")
+@Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
 public class User extends BaseTime {
 
@@ -65,5 +65,7 @@ public class User extends BaseTime {
         this.level = request.level();
         this.taste = request.taste();
     }
+
+
 
 }

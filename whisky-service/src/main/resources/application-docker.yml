@@ -13,13 +13,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 
   config:
-    import: "optional:file:.env[.properties]"
-
-redis:
-  refresh-token:
-    host: refresh-token-redis
-    port: 6379
-    password: ${REDIS_PASSWORD}
+    import: "optional:file:.env.prod[.properties]"
 
 eureka:
   client:
@@ -36,3 +30,6 @@ jwt:
   refresh:
     expiration: 1209600000
     header: Authorization-refresh
+
+whisky-edition:
+  url: https://thewhiskyedition.com/api/whisky/get

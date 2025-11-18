@@ -22,7 +22,7 @@ public class AuthUser extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "auth_user_id", nullable = false, updatable = false,columnDefinition = "VARCHAR(36")
+    @Column(name = "auth_user_id", nullable = false, updatable = false)
     private String id;
 
     @Column(name = "email", nullable = false, updatable = false)

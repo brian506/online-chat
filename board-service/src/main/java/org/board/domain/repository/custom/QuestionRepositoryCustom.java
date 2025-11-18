@@ -1,7 +1,7 @@
 package org.board.domain.repository.custom;
 
-import org.board.domain.dto.response.QuestionResponse;
-import org.board.domain.entity.BoardTopic;
+import org.board.domain.dto.response.BoardResponse;
+import org.board.domain.entity.Tags;
 import org.board.domain.entity.SortType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,6 +18,6 @@ public interface QuestionRepositoryCustom {
      * @return
      */
     // 해당 게시판의 모든 질문들 불러오기
-    Slice<QuestionResponse> getQuestionsByCursor(BoardTopic boardTopic, SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable);
+    Slice<BoardResponse> getQuestionsByCursor(Tags tags, SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable);
 }
 

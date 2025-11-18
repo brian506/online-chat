@@ -1,0 +1,27 @@
+data:
+  mongodb:
+    uri: ${MONGO_DB_URL}
+    database: ${MONGO_DB_NAME}
+    auto-index-creation: true
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
+domain:
+  websocket:
+    chat: /chat-ws
+    publish: /pub
+    subscribe: /topic
+
+jwt:
+  secretKey: ${JWT_KEY}
+  access:
+    expiration: 3600000 # 1시간
+    header: Authorization
+  refresh:
+    expiration: 1209600000 # 14일
+    header: Authorization-refresh
