@@ -2,11 +2,12 @@ package org.user.domain.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.user.domain.entity.User;
+import org.user.domain.repository.custom.UserRepositoryCustom;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<User, String> {
+public interface UserRepository extends JpaRepository<User, String> , UserRepositoryCustom {
     boolean existsByNickname(String nickname);
 
 }

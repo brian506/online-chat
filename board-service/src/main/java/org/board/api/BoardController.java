@@ -36,15 +36,29 @@ public class BoardController {
     }
 
     // 위스키 즐겨찾기한 피드 조회 - 커서
-    @GetMapping
+    @GetMapping("/favorite-whiskies")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getBoards(@RequestParam(name = "sortType", defaultValue = "LATEST") SortType sortType,
+    public ResponseEntity<?> getFavoriteBoards(@RequestParam(name = "sortType", defaultValue = "LATEST") SortType sortType,
                                        @RequestParam(name = "cursorValue", required = false) Integer cursorValue,
                                        @RequestParam(name = "cursorCreatedAt", required = false)
                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorCreatedAt,
                                        @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Slice<BoardResponse> boardResponses = boardService.getBoardsByCursor(sortType, cursorValue, cursorCreatedAt, size);
+        Slice<BoardResponse> boardResponses = boardService.getFavoritesBoardsByCursor(sortType, cursorValue, cursorCreatedAt, size);
+        SuccessResponse response = new SuccessResponse(true, SuccessMessages.ID_POSTS_RETRIEVE_SUCCESS, boardResponses);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // 팔로잉한 사람들의 피드 조회 - 커서
+    @GetMapping("/followings")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getFollowingBoards(@RequestParam(name = "sortType", defaultValue = "LATEST") SortType sortType,
+                                       @RequestParam(name = "cursorValue", required = false) Integer cursorValue,
+                                       @RequestParam(name = "cursorCreatedAt", required = false)
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorCreatedAt,
+                                       @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        Slice<BoardResponse> boardResponses = boardService.getFollowingBoardsByCursor(sortType, cursorValue, cursorCreatedAt, size);
         SuccessResponse response = new SuccessResponse(true, SuccessMessages.ID_POSTS_RETRIEVE_SUCCESS, boardResponses);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

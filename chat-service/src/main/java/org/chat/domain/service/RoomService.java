@@ -8,6 +8,7 @@ import org.chat.domain.dto.response.*;
 import org.chat.domain.entity.*;
 import org.chat.domain.repository.MessageRepository;
 import org.chat.domain.repository.RoomRepository;
+import org.chat.domain.service.client.BoardServiceClient;
 import org.common.exception.custom.DataNotFoundException;
 import org.common.utils.ListUtil;
 import org.common.utils.OptionalUtil;
@@ -26,16 +27,15 @@ public class RoomService {
     private final PublishService publishService;
     private final BoardServiceClient boardServiceClient;
 
-    public RoomUserResponse createPrivateRoom(String answerId) {
-        AnswerFromBoardResponse boardResponse = boardServiceClient.getBoardInfo(answerId);
-        Room room = createOrGetRoom(boardResponse);
-        String view = viewByRole(boardResponse.askerId(), room);
-
-        // 채팅방 발행
-        CreateRoomEvent roomEvent = CreateRoomEvent.of(room.getId(), boardResponse.askerId(), boardResponse.answererId());
-        publishService.publishRoomCreated(roomEvent);
-        return RoomUserResponse.of(room.getId(), view);
-    }
+//    public RoomUserResponse createPrivateRoom(final String userId) {
+//
+//        String view = viewByRole(boardResponse.askerId(), room);
+//
+//        // 채팅방 발행
+//        CreateRoomEvent roomEvent = CreateRoomEvent.of(room.getId(), boardResponse.askerId(), boardResponse.answererId());
+//        publishService.publishRoomCreated(roomEvent);
+//        return RoomUserResponse.of(room.getId(), view);
+//    }
 
 
     // 내 채팅방 목록

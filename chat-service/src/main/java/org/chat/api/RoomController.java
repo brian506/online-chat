@@ -25,15 +25,15 @@ public class RoomController {
     private final RoomService roomService;
 
     // 방 생성
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> createRoom(@AuthenticationPrincipal StompPrincipal me,
-                                        @RequestBody CreateRoomRequest request){
-        RoomUserResponse roomUserResponse = roomService.createPrivateRoom(request.answerId());
-        log.info("createRoom me={}, target={}", me.getName(), request.answerId());
-        SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",roomUserResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//    @PostMapping
+//    @PreAuthorize("isAuthenticated()")
+//    public ResponseEntity<?> createRoom(@AuthenticationPrincipal StompPrincipal me,
+//                                        @RequestBody CreateRoomRequest request){
+//        RoomUserResponse roomUserResponse = roomService.createPrivateRoom(request.answerId());
+//        log.info("createRoom me={}, target={}", me.getName(), request.answerId());
+//        SuccessResponse response = new SuccessResponse(true,"채팅방 생성 성공",roomUserResponse);
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
     // 내 채팅방 목록 조회
     @GetMapping("/my-rooms/{userId}")
