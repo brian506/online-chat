@@ -15,7 +15,6 @@ import org.whisky.domain.entity.WhiskyMetaData;
 @Builder
 public class WhiskyApiResponse {
 
-    private String id;
     private String name;
     private String description;
 
@@ -26,7 +25,6 @@ public class WhiskyApiResponse {
 
     public static Whisky toWhisky(WhiskyApiResponse response){
         return Whisky.builder()
-                .id(response.getId())
                 .name(response.getName())
                 .description(response.getDescription())
                 .imageUrl(response.imageUrl)

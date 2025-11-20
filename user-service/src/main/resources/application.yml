@@ -1,10 +1,10 @@
-
+# 정적인 공통파일만
 server:
   port: 8082
   address: 0.0.0.0
   tomcat:
     threads:
-      max: 200
+      max: 100
       min-spare: 20
       max-queue-capacity: 1000
     max-connections: 10000
@@ -19,8 +19,6 @@ spring:
     web-application-type: servlet
   application:
     name: user-service
-  config:
-    import: "optional:file:.env[.properties]"
   jackson:
     time-zone: Asia/Seoul
   http:
@@ -28,46 +26,8 @@ spring:
       charset: UTF-8
       enabled: true
       force: true
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql:3306/user_db?serverTimezone=Asia/Seoul
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
 
 logging:
   level:
     root: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
-    org.springframework.orm.jpa: DEBUG
-    org.springframework.transaction: debug
     org.springframework.security: DEBUG
-
-redis:
-  refresh-token:
-    host: localhost
-    port: 6381
-    password: ${REDIS_PASSWORD}
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: ${EUREKA_URL}
-
-jwt:
-  secretKey: ${JWT_KEY}
-  access:
-    expiration: 3600000 # 1시간
-    header: Authorization
-  refresh:
-    expiration: 1209600000 # 14일
-    header: Authorization-refresh
-

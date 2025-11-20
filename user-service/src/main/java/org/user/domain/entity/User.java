@@ -9,9 +9,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.user.config.BaseTime;
 import org.user.domain.dto.request.CreateUserRequest;
 import org.user.domain.dto.request.UserPreferenceRequest;
-import org.user.domain.dto.response.UserResponse;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Entity
@@ -19,13 +19,21 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Builder
-@Table(name = "user")
+@Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
 public class User extends BaseTime {
 
     @Id
     @Column(name = "user_id",nullable = false,updatable = false)
     private String id; // auth 에서 생성한 userId로 매핑
+
+    // 나의 팔로워
+    @OneToMany(mappedBy = "following",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Follow> followers;
+
+    // 나의 팔로잉( user.getFollowings() X)
+    @OneToMany(mappedBy = "follower",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Follow> followings;
 
     @Column(name = "nickname",nullable = false)
     private String nickname;
@@ -49,6 +57,12 @@ public class User extends BaseTime {
     @Enumerated(EnumType.STRING)
     private Grade grade; // 서비스 내 등급
 
+    @Column(name = "follower_count")
+    private int followerCount;
+
+    @Column(name = "following_count")
+    private int followingCount;
+
     // 회원가입
     public static User signUpDtoToEntity(CreateUserRequest request,String userId){
         return User.builder()
@@ -64,6 +78,26 @@ public class User extends BaseTime {
     public void updatePreferences(UserPreferenceRequest request){
         this.level = request.level();
         this.taste = request.taste();
+    }
+
+    public void incrementFollowerCount() {
+        this.followerCount++;
+    }
+
+    public void decrementFollowerCount() {
+        if(this.followerCount > 0){
+            this.followerCount--;
+        }
+    }
+
+    public void incrementFollowingCount() {
+        this.followingCount++;
+    }
+
+    public void decrementFollowingCount() {
+        if(this.followingCount > 0){
+            this.followingCount--;
+        }
     }
 
 }

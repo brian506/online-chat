@@ -24,9 +24,13 @@ public final class SuccessMessages {
         public static final String USERNAME_RETRIEVE_SUCCESS = "회원이름으로 조회 성공";
         public static final String AUTH_USER_INFO_SUCCESS = "인증정보 조회 성공";
         public static final String USER_DELETE_SUCCESS = "회원 삭제 성공";
+        public static final String FOLLOW_CREATE_SUCCESS = "팔로잉 성공";
+        public static final String UNFOLLOW_SUCCESS = "언팔로잉 성공";
 
         // comment
 
 
-
+        // whisky
+        public static final String WHISKY_ADD_FAVORITES = "위스키 즐겨찾기 등록 성공";
+        public static final String WHISKY_FAVORITES_RETRIEVE_SUCCESS = "즐겨찾기인 위스키 조회 성공";
 }

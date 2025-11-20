@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none # 운영에서는 절대 update 쓰지 않음!
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  config:
+    import: "optional:file:.env[.properties]"
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URL}
+
+jwt:
+  secretKey: ${JWT_KEY}
+  access:
+    expiration: 3600000
+    header: Authorization
+  refresh:
+    expiration: 1209600000
+    header: Authorization-refresh
+
+cloud:
+  aws:
+    s3:
+      bucket:
+        name: ${S3}
+
+
+feign:
+  client:
+    config:
+      user-service:
+        connectTimeout: 1000 # 연결을 시도할 최대 시간 (ms) - 1초
+        readTimeout: 1000

@@ -34,7 +34,7 @@ public class SecurityConfig {
                         // ★ 프리플라이트(OPTIONS) 전부 허용
                         .pathMatchers(String.valueOf(HttpMethod.OPTIONS), "/**").permitAll()
                         // 공개 경로
-                        .pathMatchers("/oauth2/**").permitAll()
+                        .pathMatchers("/v1/api/whisky/**").permitAll()
                         .pathMatchers("/ws/**").permitAll()
                         .pathMatchers("/chat-ws/**").permitAll()
                         // 그 외는 인증

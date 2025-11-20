@@ -1,18 +1,23 @@
 spring:
   datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
-      ddl-auto: update # 개발 환경에서는 update, 운영 환경에서는 validate 또는 none을 권장합니다.
+      ddl-auto: none # 운영에서는 절대 update 쓰지 않음!
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
   config:
     import: "optional:file:.env[.properties]"
 
 redis:
   refresh-token:
-    host: refresh-token-redis # 'localhost' -> 'refresh-token-redis'
+    host: refresh-token-redis
     port: 6379
     password: ${REDIS_PASSWORD}
 
@@ -26,8 +31,8 @@ eureka:
 jwt:
   secretKey: ${JWT_KEY}
   access:
-    expiration: 3600000 # 1시간
+    expiration: 3600000
     header: Authorization
   refresh:
-    expiration: 1209600000 # 14일
+    expiration: 1209600000
     header: Authorization-refresh

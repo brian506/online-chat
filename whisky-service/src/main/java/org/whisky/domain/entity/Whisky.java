@@ -19,11 +19,11 @@ public class Whisky {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "whisky_id", nullable = false, updatable = false,columnDefinition = "VARCHAR(36")
+    @Column(name = "whisky_id", nullable = false, updatable = false)
     private String id;
 
-    @OneToOne(mappedBy = "whisky", cascade = CascadeType.ALL)
-    private WhiskyAlias alias;
+//    @OneToOne(mappedBy = "whisky", cascade = CascadeType.ALL)
+//    private WhiskyAlias alias;
 
     @Column(name = "name")
     private String name;
@@ -35,6 +35,5 @@ public class Whisky {
     private String imageUrl;
 
     @Embedded
-    @Column(name = "metadata")
     private WhiskyMetaData metadata;
 }
