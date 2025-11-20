@@ -1,14 +1,13 @@
 package org.board.domain.repository.custom;
 
 import org.board.domain.dto.response.BoardResponse;
-import org.board.domain.entity.Tags;
 import org.board.domain.entity.SortType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 
-public interface QuestionRepositoryCustom {
+public interface BoardRepositoryCustom {
 
     /**
      *
@@ -17,7 +16,8 @@ public interface QuestionRepositoryCustom {
      * @param cursorCreatedAt - 프론트가 직전에 받은 페이지의 마지막 게시글의 생성일자
      * @return
      */
-    // 해당 게시판의 모든 질문들 불러오기
-    Slice<BoardResponse> getQuestionsByCursor(Tags tags, SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable);
+    // 관심등록한 위스키 게시물 조회
+    Slice<BoardResponse> getFavoritesBoardsByCursor(String userId,  SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable);
+    Slice<BoardResponse> getFollowingBoardsByCursor(String userId,  SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable);
 }
 

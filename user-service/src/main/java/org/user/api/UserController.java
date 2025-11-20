@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.user.domain.dto.request.CreateUserRequest;
 import org.user.domain.dto.request.UserPreferenceRequest;
+import org.user.domain.dto.request.WhiskyFavoritesRequest;
 import org.user.domain.dto.response.SignUpUserResponse;
 import org.user.domain.dto.response.UserPreferenceResponse;
 import org.user.domain.dto.response.UserResponse;
@@ -73,6 +74,15 @@ public class UserController {
     public ResponseEntity<?> unFollowUser(@PathVariable String userId){
         userService.unFollowUser(userId);
         SuccessResponse response = new SuccessResponse(true,SuccessMessages.UNFOLLOW_SUCCESS,null);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    // 위스키 즐겨찾기 추가
+    @PostMapping("/whisky-favorites")
+    @PreAuthorize(("isAuthenticated()"))
+    public ResponseEntity<?> addWhiskyFavorites(@RequestBody WhiskyFavoritesRequest request){
+        String whiskyId = userService.addWhiskyFavorites(request);
+        SuccessResponse response = new SuccessResponse(true,SuccessMessages.WHISKY_ADD_FAVORITES,whiskyId);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }

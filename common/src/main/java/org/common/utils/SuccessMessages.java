@@ -30,5 +30,7 @@ public final class SuccessMessages {
         // comment
 
 
-
+        // whisky
+        public static final String WHISKY_ADD_FAVORITES = "위스키 즐겨찾기 등록 성공";
+        public static final String WHISKY_FAVORITES_RETRIEVE_SUCCESS = "즐겨찾기인 위스키 조회 성공";
 }

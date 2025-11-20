@@ -38,4 +38,5 @@ public class Follow extends BaseTime {
                 .following(following)
                 .build();
     }
+
 }

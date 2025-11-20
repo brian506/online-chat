@@ -23,9 +23,6 @@ public class Comment extends BaseTime{
     @Column(name = "comment_id", nullable = false, updatable = false)
     private String id;
 
-    @Column(name = "comment_id",nullable = false,updatable = false)
-    private String commentId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
@@ -39,10 +36,7 @@ public class Comment extends BaseTime{
     @Column(name = "comment", nullable = false)
     private String comment;
 
-    @Column(name = "room_id")
-    private String roomId;
-
-    public static Comment toAnswerEntity(CreateCommentRequest request, UserResponse userResponse){
+    public static Comment toCommentEntity(CreateCommentRequest request, UserResponse userResponse){
         return Comment.builder()
                 .writerId(userResponse.userId())
                 .writerNickname(userResponse.nickname())
@@ -50,28 +44,5 @@ public class Comment extends BaseTime{
                 .build();
     }
 
-    public static AnswerResponse toAnswerDto(Comment comment){
-        return new AnswerResponse(
-                comment.getId(),
-                comment.getBoard().getId(),
-                comment.getAnswererId(),
-                comment.getWriterNickname(),
-                comment.getAnswererTags(),
-                comment.getAnswererJobs(),
-                comment.getComment(),
-                comment.getCreatedAt()
-        );
-    }
 
-    public static AnswerChatResponse toChatRoomDto(Comment comment){
-        return new AnswerChatResponse(
-                comment.getId(),
-                comment.board.getId(),
-                comment.board.getAskerId(),
-                comment.getAnswererId(),
-                comment.writerNickname,
-                comment.board.getAskerNickname(),
-                comment.getCreatedAt()
-        );
-    }
 }
