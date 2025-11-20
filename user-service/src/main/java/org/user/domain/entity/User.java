@@ -58,10 +58,10 @@ public class User extends BaseTime {
     private Grade grade; // 서비스 내 등급
 
     @Column(name = "follower_count")
-    private int followerCount;
+    private long followerCount;
 
     @Column(name = "following_count")
-    private int followingCount;
+    private long followingCount;
 
     // 회원가입
     public static User signUpDtoToEntity(CreateUserRequest request,String userId){

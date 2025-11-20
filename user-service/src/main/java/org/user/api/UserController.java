@@ -50,11 +50,11 @@ public class UserController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    // 내 정보 조회
-    @GetMapping("/my-page/{userId}")
+    // 사용자 정보 조회
+    @GetMapping("/{userId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getMyInfo(@PathVariable String userId){
-        UserResponse userResponse = userService.getMyInfo(userId);
+    public ResponseEntity<?> getUserInfo(@PathVariable String userId){
+        UserResponse userResponse = userService.getUser(userId);
         SuccessResponse response = new SuccessResponse(true,SuccessMessages.USER_RETRIEVE_SUCCESS,userResponse);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

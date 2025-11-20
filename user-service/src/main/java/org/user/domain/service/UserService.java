@@ -2,9 +2,8 @@ package org.user.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import org.common.exception.custom.ConflictException;
-import org.common.utils.OptionalUtil;
-import org.common.utils.SecurityUtil;
-import org.common.utils.SuccessMessages;
+import org.common.exception.custom.DataNotFoundException;
+import org.common.utils.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +27,7 @@ import org.user.producer.KafkaEventListener;
 import org.user.producer.KafkaProducer;
 
 import javax.swing.text.html.Option;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -67,18 +67,15 @@ public class UserService {
         return UserPreferenceResponse.from(user);
     }
 
-    // 내 정보 조회
+    // 사용자 정보 조회
     @Transactional(readOnly = true)
-    public UserResponse getMyInfo(final String userId){
+    public UserResponse getUser(final String userId){
         String loginUserId = SecurityUtil.getCurrentUserId();
-        User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),"존재하지 않는 사용자입니다.");
-
-        long followerCount  = followRepository.countByFollower_Id(userId); // 팔로워수
-        long followingCount = followRepository.countByFollowing_Id(userId); // 팔로잉수
-        boolean followingByMe = followRepository
-                .existsByFollower_IdAndFollowing_Id(loginUserId, userId); // 내가 팔로잉 하는 사람인지
-
-        return UserResponse.userResponseToDto(user,followerCount,followingCount,followingByMe);
+        UserResponse response = userRepository.getUserInfo(userId,loginUserId);
+        if(response == null){
+            throw new DataNotFoundException(ErrorMessages.USER_NOT_FOUND);
+        }
+        return response;
     }
 
     // 정보 조회 후 받은 userId 로 팔로잉 추가

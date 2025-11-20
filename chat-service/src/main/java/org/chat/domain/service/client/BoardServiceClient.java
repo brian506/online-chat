@@ -1,4 +1,4 @@
-package org.chat.domain.service;
+package org.chat.domain.service.client;
 
 
 import org.chat.domain.dto.response.AnswerFromBoardResponse;
