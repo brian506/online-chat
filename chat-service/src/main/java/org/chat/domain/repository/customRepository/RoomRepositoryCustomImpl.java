@@ -5,7 +5,6 @@ import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.chat.domain.entity.Room;
-import org.chat.domain.entity.UserType;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,12 +22,12 @@ public class RoomRepositoryCustomImpl implements RoomRepositoryCustom{
 
     // 사용자의 질문자/답변자 화면에 따른 채팅방 목록 조회(커서 기반)
     @Override
-    public List<Room> findRoomsByUserAndType(String userId, UserType userType, String cursor) {
+    public List<Room> findRoomsByUserId(String userId, String cursor) {
 
         Query query = new Query();
         // 2. 핵심 조건: participants 배열 내부 검색 ($elemMatch)
-        Criteria userCriteria = Criteria.where("user_id").is(userId)
-                .and("user_type").is(userType);
+        Criteria userCriteria = Criteria.where("user_id").is(userId);
+
 
         query.addCriteria(Criteria.where("participants").elemMatch(userCriteria));
 

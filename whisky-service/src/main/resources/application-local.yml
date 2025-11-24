@@ -8,7 +8,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create   # 개발 편의를 위해 update
+      ddl-auto: update   # 개발 편의를 위해 update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect

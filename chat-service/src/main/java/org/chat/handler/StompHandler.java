@@ -3,8 +3,7 @@ package org.chat.handler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chat.security.JwtUtil;
-import org.chat.security.StompPrincipal;
-import org.common.exception.custom.DataNotFoundException;
+import org.common.utils.UserPrincipal;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
@@ -13,7 +12,6 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 
@@ -43,10 +41,10 @@ public class StompHandler implements ChannelInterceptor {
             String token = authHeader.substring(7);
 
             Authentication authentication = jwtUtil.getAuthentication(token);
-            var principal = (StompPrincipal) authentication.getPrincipal();
-            accessor.setUser(principal);
+            UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+            accessor.setUser(authentication);
             // 다른 프레임에서도 해당 인증 객체를 사용하기 위해 세션에 저장해둠
-            accessor.getSessionAttributes().put(USER_ID_KEY, principal.getUserId());
+            accessor.getSessionAttributes().put(USER_ID_KEY, principal.userId());
 
             accessor.setLeaveMutable(true);
             log.info("✅ STOMP CONNECT 인증 성공: user={}", authentication.getName());

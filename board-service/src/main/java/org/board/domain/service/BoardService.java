@@ -10,10 +10,7 @@ import org.board.domain.entity.Comment;
 import org.board.domain.entity.SortType;
 import org.board.domain.repository.BoardRepository;
 import org.board.utils.FileService;
-import org.common.utils.ErrorMessages;
-import org.common.utils.ListUtil;
-import org.common.utils.OptionalUtil;
-import org.common.utils.SecurityUtil;
+import org.common.utils.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -29,17 +26,15 @@ import java.util.List;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final UserServiceClient userServiceClient;
     private final FileService fileService;
     private final CommentService commentService;
 
     // 위스키 게시글 작성
     @Transactional
     public String postBoard(final CreateBoardRequest createBoardRequest,final MultipartFile image){
-        String userId = SecurityUtil.getCurrentUserId();
-        UserResponse userResponse = userServiceClient.getUser(userId);
+        UserPrincipal loginUser = SecurityUtil.getCurrentUser();
 
-        Board board = Board.toBoardEntity(createBoardRequest,userResponse);
+        Board board = Board.toBoardEntity(createBoardRequest,loginUser);
         String url = uploadImage(image);
         board.setImageUrl(url);
         boardRepository.save(board);

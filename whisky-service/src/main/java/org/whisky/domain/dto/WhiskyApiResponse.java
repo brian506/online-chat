@@ -16,19 +16,11 @@ import org.whisky.domain.entity.WhiskyMetaData;
 public class WhiskyApiResponse {
 
     private String name;
-    private String description;
+    private String nose;
 
     @JsonProperty("image_url")
     private String imageUrl;
 
     private WhiskyMetaData metadata;
 
-    public static Whisky toWhisky(WhiskyApiResponse response){
-        return Whisky.builder()
-                .name(response.getName())
-                .description(response.getDescription())
-                .imageUrl(response.imageUrl)
-                .metadata(response.getMetadata())
-                .build();
-    }
 }

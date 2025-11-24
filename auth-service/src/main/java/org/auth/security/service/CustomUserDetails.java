@@ -9,14 +9,14 @@ import java.util.Collection;
 @Getter
 public class CustomUserDetails implements UserDetails {
 
-    private Long id;
-    private String email;
+    private String id;
+    private String nickname;
     private String password;
     private Collection<GrantedAuthority> authorities;
 
-    public CustomUserDetails(Long id, String email, String password, Collection<GrantedAuthority> authorities){
+    public CustomUserDetails(String id, String nickname, String password, Collection<GrantedAuthority> authorities){
         this.id = id;
-        this.email = email;
+        this.nickname = nickname;
         this.password = password;
         this.authorities = authorities;
     }
@@ -33,7 +33,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return nickname;
     }
 
     @Override

@@ -143,6 +143,8 @@ public class UserService {
         publisher.publishEvent(event);
     }
 
+    // 팔로우,팔로잉 사용자들 조회
+
     // 사용자 삭제 (탈퇴)
     @Transactional
     public void deleteUser(final String userId){

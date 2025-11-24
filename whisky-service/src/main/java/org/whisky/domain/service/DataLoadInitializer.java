@@ -36,7 +36,7 @@ public class DataLoadInitializer {
             }
 
             List<Whisky> entities = list.stream()
-                    .map(WhiskyApiResponse::toWhisky)
+                    .map(Whisky::toWhisky)
                     .toList();
 
             repository.saveAll(entities);

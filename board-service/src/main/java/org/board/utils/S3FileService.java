@@ -2,6 +2,7 @@ package org.board.utils;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import lombok.RequiredArgsConstructor;
 import org.common.exception.custom.S3UploadException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;

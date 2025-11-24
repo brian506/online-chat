@@ -3,7 +3,7 @@ package org.board.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.board.domain.dto.request.CreateBoardRequest;
-import org.board.domain.dto.response.UserResponse;
+import org.common.utils.UserPrincipal;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -69,11 +69,11 @@ public class Board extends BaseTime{
         this.viewCount++;
     }
 
-    public static Board toBoardEntity(CreateBoardRequest request, UserResponse userResponse){
+    public static Board toBoardEntity(CreateBoardRequest request, UserPrincipal loginUser){
         return Board.builder()
-                .writerId(userResponse.userId())
+                .writerId(loginUser.userId())
                 .whiskyId(request.whiskyId())
-                .writerNickname(userResponse.nickname())
+                .writerNickname(loginUser.nickname())
                 .tags(request.tags())
                 .title(request.title())
                 .content(request.content())
