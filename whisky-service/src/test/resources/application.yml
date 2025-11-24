@@ -1,0 +1,19 @@
+# 서비스마다 달라지는 값
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3309/whisky_db?serverTimezone=Asia/Seoul
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # 개발 편의를 위해 update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  config:
+    import: "optional:file:.env.local[.properties]"
+jwt:
+  secretKey: askdhjgfiuasdfkj

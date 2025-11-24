@@ -62,15 +62,15 @@ spring:
           predicates:
             - Path=/chat-ws/**
 
-        - id: question-board
+        - id: board
           uri: lb://board-service
           predicates:
-            - Path=/v1/api/questions/**
+            - Path=/v1/api/boards/**
 
-        - id: answer-board
+        - id: comment
           uri: lb://board-service
           predicates:
-            - Path=/v1/api/answer/**
+            - Path=/v1/api/comments/**
 
         - id: whisky
           uri: lb://whisky-service
