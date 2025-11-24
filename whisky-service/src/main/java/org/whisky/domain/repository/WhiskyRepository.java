@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface WhiskyRepository extends JpaRepository<Whisky,String> {
     Optional<Whisky> findBySearchKeyword(String searchKeyword);
+    boolean existsByName(String name);
 }

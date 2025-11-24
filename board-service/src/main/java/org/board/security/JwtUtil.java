@@ -1,5 +1,5 @@
+package org.board.security;
 
-package org.chat.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

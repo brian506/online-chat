@@ -23,11 +23,17 @@ public class Whisky {
     @Column(name = "whisky_id", nullable = false, updatable = false)
     private String id;
 
-    @Column(name = "name")
+     @Column(name = "name")
     private String name;
 
-    @Column(name = "nose")
+    @Column(name = "nose",columnDefinition = "TEXT")
     private String nose;
+
+    @Column(name = "palate",columnDefinition = "TEXT")
+    private String palate;
+
+    @Column(name = "finish",columnDefinition = "TEXT")
+    private String finish;
 
     @Column(name = "image_url")
     private String imageUrl;
