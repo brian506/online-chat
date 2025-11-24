@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.common.utils.UserPrincipal;
 import org.auth.domain.entity.Role;
 import org.auth.domain.entity.Token;
 import org.auth.domain.entity.AuthUser;
@@ -87,7 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         AuthUser authUser = OptionalUtil.getOrElseThrow(authUserRepository.findById(token.getUserId()),"존재하지 않는 사용자입니다.");
 
         String newAccessToken = jwtService.createAccessToken(
-                new AccessTokenPayload(token.getUserId(), authUser.getEmail(), Role.GENERAL, new Date())
+                new AccessTokenPayload(token.getUserId(), authUser.getNickname(), Role.GENERAL, new Date())
         );
 
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);
@@ -99,9 +100,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void setAuthentication(String accessToken) {
         Claims claims = jwtService.verifyToken(accessToken);
         String userId = claims.getSubject();
+        String nickname = claims.get("nickname",String.class);
         String role = claims.get("role", String.class);
+        UserPrincipal userPrincipal = UserPrincipal.of(userId,nickname);
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userId, null, List.of(grantedAuthority));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userPrincipal, null, List.of(grantedAuthority));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

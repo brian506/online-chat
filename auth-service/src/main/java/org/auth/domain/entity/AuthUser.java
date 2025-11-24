@@ -28,6 +28,9 @@ public class AuthUser extends BaseTime {
     @Column(name = "email", nullable = false, updatable = false)
     private String email;
 
+    @Column(name = "nickname",nullable = false)
+    private String nickname;
+
     @Column(name = "password", nullable = false, updatable = false)
     private String password;
 
@@ -45,6 +48,7 @@ public class AuthUser extends BaseTime {
         return AuthUser.builder()
                 .email(request.email())
                 .password(request.password())
+                .nickname(request.nickname())
                 .role(Role.GENERAL)
                 .build();
     }
@@ -52,7 +56,8 @@ public class AuthUser extends BaseTime {
     public static CreateUserResponse toUserDto(AuthUser user){
         return new CreateUserResponse(
                 user.getEmail(),
-                user.getPassword()
+                user.getPassword(),
+                user.getNickname()
         );
     }
 }

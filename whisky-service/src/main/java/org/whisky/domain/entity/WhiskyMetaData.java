@@ -31,6 +31,5 @@ public class WhiskyMetaData {
     @Column(name = "abv")
     private Double abv; // 도수
 
-    @Column(name = "nose")
-    private String nose;
+
 }

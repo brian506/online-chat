@@ -4,20 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chat.domain.dto.request.CreateReadMessageEvent;
 import org.chat.domain.dto.request.SendMessageEvent;
-import org.chat.domain.dto.response.MessageReadResponse;
 import org.chat.domain.service.MessageService;
-import org.chat.domain.service.PublishService;
 import org.chat.domain.service.RoomService;
-import org.chat.security.StompPrincipal;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.security.Principal;
 
 @Slf4j
 @RestController

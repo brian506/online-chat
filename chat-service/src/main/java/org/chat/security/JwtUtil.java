@@ -4,21 +4,19 @@ package org.chat.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.common.exception.custom.JwtValidationException;
+import org.common.utils.UserPrincipal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.security.Principal;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -47,15 +45,17 @@ public class JwtUtil {
         // 여기서 jwt 토큰 검증
         Claims claims = parseClaims(accessToken);
         String userId = claims.getSubject();
+        String nickname = claims.get("nickname",String.class);
         String role = claims.get("role", String.class);
-        StompPrincipal principal = new StompPrincipal(userId);
+
+        UserPrincipal userPrincipal = new UserPrincipal(userId,nickname);
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
-        return new UsernamePasswordAuthenticationToken(principal,null,List.of(grantedAuthority));
+        return new UsernamePasswordAuthenticationToken(userPrincipal,null,List.of(grantedAuthority));
     }
 
-    public String getEmailFromToken(final String accessToken){
+    public String getNicknameFromToken(final String accessToken){
         Claims claims = parseClaims(accessToken);
-        return claims.get("email",String.class);
+        return claims.get("nickname",String.class);
     }
 
     public Optional<String> extractAccessToken(HttpServletRequest request) {

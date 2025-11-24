@@ -3,12 +3,10 @@ package org.chat.domain.entity;
 import lombok.Builder;
 import lombok.Getter;
 import org.chat.domain.dto.request.CreateReadMessageEvent;
-import org.chat.domain.dto.response.AnswerFromBoardResponse;
 import org.chat.domain.dto.response.MessageReadResponse;
 import org.chat.domain.dto.response.RoomResponse;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -18,20 +16,18 @@ import java.util.List;
 @Getter
 @Builder
 @Document(collection = "rooms")
-@CompoundIndexes({
-        @CompoundIndex(
-                name = "idx_part_user_type_last",
-                def = "{'participants.user_id' : 1, 'participants.user_type' : 1 , 'last_message_at' : -1}"
-        )
-}) // 질문 받은, 질문한 목록들을 (사용자ID + UserType)복합인덱스를 사용하여 최근 채팅순으로 조회 최적화
 public class Room  {
     // todo 닉네임을 기준으로 복합인덱스 생성하여 조회 성능 향상
 
     @Id
-    private String id; // 답변Id 로?
+    private String id;
 
     @Field(name = "room_type")
     private RoomType roomType;
+
+    @Indexed(unique = true)
+    @Field(name = "room_key")
+    private String roomKey;
 
     @Field(name = "participants") // 질문자,답변자 등 정보(실명,닉네임)
     private List<Participant> participants;
@@ -40,10 +36,10 @@ public class Room  {
     private LocalDateTime createdAt;
 
 
-    public static Room ofPrivateRoom(AnswerFromBoardResponse response,Participant asker, Participant answerer) {
+    public static Room ofPrivateRoom(Participant asker, Participant answerer,String roomKey) {
         return Room.builder()
-                .id(response.answerId())
                 .roomType(RoomType.PRIVATE)
+                .roomKey(roomKey)
                 .participants(List.of(asker, answerer))
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -67,6 +63,13 @@ public class Room  {
         );
     }
 
-
+    // 중복키 생성 메서드
+    public static String generateRoomKey(String userId1, String userId2) {
+        if (userId1.compareTo(userId2) < 0) {
+            return userId1 + "_" + userId2;
+        } else {
+            return userId2 + "_" + userId1;
+        }
+    }
 
 }

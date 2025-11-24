@@ -2,19 +2,18 @@ package org.whisky.domain.dto;
 
 
 import org.whisky.domain.entity.Whisky;
+import org.whisky.domain.entity.WhiskyMetaData;
 
-public record WhiskyResponse(String name, String description, String country, String type, String bottler, Integer age
-         , Double abv) {
+public record WhiskyResponse(String whiskyId, String name, String nose, String imageUrl, WhiskyMetaData metaData) {
+
 
     public static WhiskyResponse toWhiskyDto(Whisky whisky){
         return new WhiskyResponse(
+                whisky.getId(),
                 whisky.getName(),
-                whisky.getDescription(),
-                whisky.getMetadata().getCountry(),
-                whisky.getMetadata().getType(),
-                whisky.getMetadata().getBottler(),
-                whisky.getMetadata().getAge(),
-                whisky.getMetadata().getAbv()
+                whisky.getNose(),
+                whisky.getImageUrl(),
+                whisky.getMetadata()
                 );
     }
 }

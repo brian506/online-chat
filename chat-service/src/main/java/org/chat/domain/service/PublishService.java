@@ -24,8 +24,8 @@ public class PublishService {
 
     // 채팅방 발행
     public void publishRoomCreated(final CreateRoomEvent event) {
-        messagingTemplate.convertAndSend(ROOM_DEST_URL + event.askerId(),event);
-        messagingTemplate.convertAndSend(ROOM_DEST_URL + event.answererId(),event);
+        messagingTemplate.convertAndSend(ROOM_DEST_URL + event.loginUserId(),event);
+        messagingTemplate.convertAndSend(ROOM_DEST_URL + event.peerId(),event);
     }
 
     // 메시지 발행

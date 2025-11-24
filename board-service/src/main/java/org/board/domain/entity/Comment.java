@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.board.domain.dto.request.CreateCommentRequest;
 import org.board.domain.dto.response.UserResponse;
+import org.common.utils.UserPrincipal;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -36,10 +37,10 @@ public class Comment extends BaseTime{
     @Column(name = "comment", nullable = false)
     private String comment;
 
-    public static Comment toCommentEntity(CreateCommentRequest request, UserResponse userResponse){
+    public static Comment toCommentEntity(CreateCommentRequest request, UserPrincipal loginUser){
         return Comment.builder()
-                .writerId(userResponse.userId())
-                .writerNickname(userResponse.nickname())
+                .writerId(loginUser.userId())
+                .writerNickname(loginUser.nickname())
                 .comment(request.comment())
                 .build();
     }

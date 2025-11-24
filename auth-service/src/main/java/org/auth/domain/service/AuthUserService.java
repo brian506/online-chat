@@ -43,7 +43,7 @@ public class AuthUserService {
 
     // 이메일 중복 검증
     private boolean validateEmail(final String email){
-        return !authUserRepository.validateEmail(email);
+        return !authUserRepository.existsByEmail(email);
     }
 
     private void encodeAndSetPassword(AuthUser user, String password) {
