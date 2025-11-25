@@ -40,9 +40,6 @@ public class WhiskyFavorites extends BaseTime {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "favorites_count")
-    private int count;
-
     public static WhiskyFavorites toEntity(WhiskyFavoritesResponse response,String userId){
         return WhiskyFavorites.builder()
                 .whiskyId(response.whiskyId())
@@ -52,10 +49,5 @@ public class WhiskyFavorites extends BaseTime {
                 .build();
     }
 
-    public void increaseCount(){
-        this.count++;
-    }
-    public void decreaseCount(){
-        this.count--;
-    }
+
 }

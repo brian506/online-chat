@@ -23,11 +23,6 @@ import org.user.domain.repository.UserRepository;
 import org.user.domain.repository.WhiskyFavoritesRepository;
 import org.user.domain.service.client.AuthServiceClient;
 import org.user.domain.service.client.WhiskyServiceClient;
-import org.user.producer.KafkaEventListener;
-import org.user.producer.KafkaProducer;
-
-import javax.swing.text.html.Option;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +42,10 @@ public class UserService {
         // Auth-service 로 email,password 가입 요청
         AuthRegisterRequest registerRequest = AuthRegisterRequest.toCreateUser(userRequest);
         AuthRegisterResponse registerResponse = authService.registerUser(registerRequest);
+
+        if(!validateEmail(userRequest.email())){
+            throw new ConflictException("이미 사용 중인 이메일입니다.");
+        }
 
         if (!validateNickname(userRequest.nickname())) {
             throw new ConflictException("이미 사용 중인 닉네임입니다.");
@@ -90,11 +89,11 @@ public class UserService {
         }
         // todo 팔로잉 했을 때 팔로잉 당한 사람에게 알람
         Follow follow = Follow.of(loginUser,targetUser);
-        loginUser.incrementFollowingCount();
-        targetUser.incrementFollowerCount();
+        loginUser.increaseFollowingCount();
+        targetUser.increaseFollowerCount();
 
         followRepository.save(follow);
-
+        // kafka event 발행
         FollowEvent event = FollowEvent.toEvent(loginUserId, targetUser.getId(),ActionType.ADD);
         publisher.publishEvent(event);
     }
@@ -106,8 +105,8 @@ public class UserService {
         User loginUser = OptionalUtil.getOrElseThrow(userRepository.findById(loginUserId),SuccessMessages.USER_RETRIEVE_SUCCESS);
         User targetUser = OptionalUtil.getOrElseThrow(userRepository.findById(userId),SuccessMessages.USER_RETRIEVE_SUCCESS);
 
-        loginUser.decrementFollowingCount();
-        targetUser.decrementFollowerCount();
+        loginUser.decreaseFollowingCount();
+        targetUser.decreaseFollowerCount();
 
         followRepository.deleteByFollower_IdAndFollowing_Id(loginUserId,userId);
 
@@ -119,12 +118,15 @@ public class UserService {
     @Transactional
     public String addWhiskyFavorites(final WhiskyFavoritesRequest request){
         String userId = SecurityUtil.getCurrentUserId();
+        User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),SuccessMessages.USER_RETRIEVE_SUCCESS);
+
         // whisky-service 에서 가져옴
         WhiskyFavoritesResponse whiskyFavoritesResponse = whiskyService.getUserFavorites(request.whiskyId());
         // 엔티티 저장
         WhiskyFavorites whiskyFavorites = WhiskyFavorites.toEntity(whiskyFavoritesResponse,userId);
-        whiskyFavorites.increaseCount();
         whiskyFavoritesRepository.save(whiskyFavorites);
+        user.increaseWhiskyCount();
+
         // 이벤트 발행(트랜잭션 COMMIT 후 이벤트 발행)
         UserWhiskyFavoritesEvent event = UserWhiskyFavoritesEvent.fromResponse(whiskyFavoritesResponse,userId, ActionType.ADD);
         publisher.publishEvent(event);
@@ -135,9 +137,12 @@ public class UserService {
     @Transactional
     public void deleteWhiskyFavorites(final WhiskyFavoritesRequest request){
         String userId = SecurityUtil.getCurrentUserId();
+        User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),SuccessMessages.USER_RETRIEVE_SUCCESS);
+
         WhiskyFavorites whiskyFavorites = OptionalUtil.getOrElseThrow(whiskyFavoritesRepository.findByUserIdAndWhiskyId(userId,request.whiskyId()),SuccessMessages.WHISKY_FAVORITES_RETRIEVE_SUCCESS);
-        whiskyFavorites.decreaseCount();
+
         whiskyFavoritesRepository.delete(whiskyFavorites);
+        user.decreaseWhiskyCount();
 
         UserWhiskyFavoritesEvent event = UserWhiskyFavoritesEvent.fromRequest(request,userId,ActionType.REMOVE);
         publisher.publishEvent(event);
@@ -156,6 +161,11 @@ public class UserService {
     // 닉네임 중복 확인
     public boolean validateNickname(final String nickname){
         return !userRepository.existsByNickname(nickname); // 사용중인 닉네임이면 false
+    }
+
+    // 이메일 중복 확인
+    public boolean validateEmail(final String email){
+        return !userRepository.existsByEmail(email);
     }
 
 

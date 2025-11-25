@@ -63,6 +63,9 @@ public class User extends BaseTime {
     @Column(name = "following_count")
     private long followingCount;
 
+    @Column(name = "whisky_count")
+    private long whiskyCount; // 위스키 즐겨찾기 개수
+
     // 회원가입
     public static User signUpDtoToEntity(CreateUserRequest request,String userId){
         return User.builder()
@@ -80,24 +83,32 @@ public class User extends BaseTime {
         this.taste = request.taste();
     }
 
-    public void incrementFollowerCount() {
+    public void increaseFollowerCount() {
         this.followerCount++;
     }
 
-    public void decrementFollowerCount() {
+    public void decreaseFollowerCount() {
         if(this.followerCount > 0){
             this.followerCount--;
         }
     }
 
-    public void incrementFollowingCount() {
+    public void increaseFollowingCount() {
         this.followingCount++;
     }
 
-    public void decrementFollowingCount() {
+    public void decreaseFollowingCount() {
         if(this.followingCount > 0){
             this.followingCount--;
         }
     }
 
+    public void increaseWhiskyCount(){
+        this.whiskyCount++;
+    }
+    public void decreaseWhiskyCount(){
+        if(this.whiskyCount > 0){
+            this.whiskyCount--;
+        }
+    }
 }

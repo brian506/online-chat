@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: user-service-test
+
+  cloud:
+    config:
+      enabled: false # Config Server 안 찾기
+    discovery:
+      enabled: false # Eureka 접속 안 하기
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL # 메모리에서만 동작하는 가짜 DB
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  jwt:
+    secret: test_secret_key_1234567890_test_key_must_be_long_enough

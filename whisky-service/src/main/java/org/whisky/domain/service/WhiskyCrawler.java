@@ -37,7 +37,7 @@ public class WhiskyCrawler {
     private static final int TARGET_COUNT = 5000;
 
     // 리스트 URL (블렌디드 몰트 예시)
-    private static final String BASE_LIST_URL = "https://www.masterofmalt.com/country-style/scotch/blended-malt-whisky/";
+    private static final String BASE_LIST_URL = "https://www.masterofmalt.com/country-style/scotch/grain-whisky/";
 
     public void runCrawler() {
         log.info("🔧 실행 중인 크롬(9222 포트)에 연결 시도 중...");
@@ -54,7 +54,7 @@ public class WhiskyCrawler {
         driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
 
         int currentCount = 0;
-        int pageNum = 1; // 2페이지까지 했으면 여기를 3으로 바꿔서 시작해도 됨
+        int pageNum = 27; // 2페이지까지 했으면 여기를 3으로 바꿔서 시작해도 됨
         Random random = new Random();
         Set<String> visitedUrlsInPage = new HashSet<>();
 
