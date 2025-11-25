@@ -50,7 +50,7 @@ public class UserServiceTest {
     private AuthServiceClient authServiceClient; // 외부 서비스 호출 Mock 처리
 
     @Mock
-    WhiskyServiceClient whiskyServiceClient;
+    private WhiskyServiceClient whiskyServiceClient;
 
     @Mock
     private UserRepository userRepository; // DB mock 처리 - 단위테스트에서는 DB 사용 X
