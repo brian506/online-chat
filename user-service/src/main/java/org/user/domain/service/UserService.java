@@ -39,17 +39,12 @@ public class UserService {
     @Transactional
     public SignUpUserResponse createUserInfo(final CreateUserRequest userRequest){
 
+        validateEmail(userRequest.email());
+        validateNickname(userRequest.nickname());
+
         // Auth-service 로 email,password 가입 요청
         AuthRegisterRequest registerRequest = AuthRegisterRequest.toCreateUser(userRequest);
         AuthRegisterResponse registerResponse = authService.registerUser(registerRequest);
-
-        if(!validateEmail(userRequest.email())){
-            throw new ConflictException("이미 사용 중인 이메일입니다.");
-        }
-
-        if (!validateNickname(userRequest.nickname())) {
-            throw new ConflictException("이미 사용 중인 닉네임입니다.");
-        }
 
         User user = User.signUpDtoToEntity(userRequest,registerResponse.userId());
         userRepository.save(user);
@@ -116,12 +111,12 @@ public class UserService {
 
     // 위스키 즐겨찾기 추가
     @Transactional
-    public String addWhiskyFavorites(final WhiskyFavoritesRequest request){
+    public void addWhiskyFavorites(final String whiskyId){
         String userId = SecurityUtil.getCurrentUserId();
         User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),SuccessMessages.USER_RETRIEVE_SUCCESS);
 
         // whisky-service 에서 가져옴
-        WhiskyFavoritesResponse whiskyFavoritesResponse = whiskyService.getUserFavorites(request.whiskyId());
+        WhiskyFavoritesResponse whiskyFavoritesResponse = whiskyService.getUserFavorites(whiskyId);
         // 엔티티 저장
         WhiskyFavorites whiskyFavorites = WhiskyFavorites.toEntity(whiskyFavoritesResponse,userId);
         whiskyFavoritesRepository.save(whiskyFavorites);
@@ -130,21 +125,20 @@ public class UserService {
         // 이벤트 발행(트랜잭션 COMMIT 후 이벤트 발행)
         UserWhiskyFavoritesEvent event = UserWhiskyFavoritesEvent.fromResponse(whiskyFavoritesResponse,userId, ActionType.ADD);
         publisher.publishEvent(event);
-        return whiskyFavorites.getWhiskyId();
     }
 
     // 위스키 즐겨찾기 삭제
     @Transactional
-    public void deleteWhiskyFavorites(final WhiskyFavoritesRequest request){
+    public void deleteWhiskyFavorites(final String whiskyId){
         String userId = SecurityUtil.getCurrentUserId();
         User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),SuccessMessages.USER_RETRIEVE_SUCCESS);
 
-        WhiskyFavorites whiskyFavorites = OptionalUtil.getOrElseThrow(whiskyFavoritesRepository.findByUserIdAndWhiskyId(userId,request.whiskyId()),SuccessMessages.WHISKY_FAVORITES_RETRIEVE_SUCCESS);
+        WhiskyFavorites whiskyFavorites = OptionalUtil.getOrElseThrow(whiskyFavoritesRepository.findByUserIdAndWhiskyId(userId,whiskyId),SuccessMessages.WHISKY_FAVORITES_RETRIEVE_SUCCESS);
 
         whiskyFavoritesRepository.delete(whiskyFavorites);
         user.decreaseWhiskyCount();
 
-        UserWhiskyFavoritesEvent event = UserWhiskyFavoritesEvent.fromRequest(request,userId,ActionType.REMOVE);
+        UserWhiskyFavoritesEvent event = UserWhiskyFavoritesEvent.fromRequest(whiskyId,userId,ActionType.REMOVE);
         publisher.publishEvent(event);
     }
 
@@ -159,13 +153,17 @@ public class UserService {
 
 
     // 닉네임 중복 확인
-    public boolean validateNickname(final String nickname){
-        return !userRepository.existsByNickname(nickname); // 사용중인 닉네임이면 false
+    public void validateNickname(final String nickname){
+        if (userRepository.existsByNickname(nickname)) {
+            throw new ConflictException("이미 사용 중인 닉네임입니다.");
+        }
     }
 
     // 이메일 중복 확인
-    public boolean validateEmail(final String email){
-        return !userRepository.existsByEmail(email);
+    public void validateEmail(final String email){
+        if (userRepository.existsByEmail(email)) {
+            throw new ConflictException("이미 사용 중인 이메일입니다.");
+        }
     }
 
 

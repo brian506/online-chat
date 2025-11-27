@@ -76,7 +76,7 @@ public class UserServiceTest {
         userService.createUserInfo(userRequest);
         //then
         verify(userRepository).save(argThat(user ->
-                        user.getNickname().equals("영민짱") &&
+                user.getNickname().equals("영민짱") &&
                         user.getGender() == Gender.MALE &&
                         user.getId().equals("1234")
         ));
@@ -174,6 +174,79 @@ public class UserServiceTest {
             }));
         }
     }
+
+    @Test
+    @DisplayName("이미 팔로잉한 사용자로 팔로잉 실패 테스트")
+    void followUser_FAIL() throws Exception {
+
+        try (MockedStatic<SecurityUtil> securityUtil = mockStatic(SecurityUtil.class)) { // 로그인 사용자 Mock 으로 강제 주입
+            //given
+            String loginUserId = "user1";
+            String targetId = "user2";
+            securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(loginUserId);
+
+            User user1 = User.builder().id(loginUserId).build();
+            User user2 = User.builder().id(targetId).build();
+
+            given(userRepository.findById(targetId)).willReturn(Optional.of(user2));
+            given(userRepository.findById(loginUserId)).willReturn(Optional.of(user1));
+
+            given(followRepository.existsByFollower_IdAndFollowing_Id(loginUserId, targetId)).willReturn(true); // 이미 팔로잉한 사용자로 설정
+            //when
+            assertThatThrownBy(() -> userService.followUser(targetId))
+                    .isInstanceOf(ConflictException.class)
+                    .extracting("errorMessage")
+                    .isEqualTo("이미 팔로우한 사용자입니다."); // when + then
+            //then
+            verify(followRepository, never()).save(any());
+            verify(publisher, never()).publishEvent(any());
+        }
+
+    }
+
+    @Test
+    @DisplayName("팔로잉 취소 성공 테스트")
+    void unfollowUser_SUCCESS() throws Exception {
+
+        try (MockedStatic<SecurityUtil> securityUtil = mockStatic(SecurityUtil.class)) { // 로그인 사용자 Mock 으로 강제 주입
+            //given
+            String loginUserId = "user1";
+            String targetId = "user2";
+            securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(loginUserId);
+
+            User user1 = User.builder()
+                    .id(loginUserId)
+                    .followingCount(1)
+                    .build();
+            User user2 = User.builder()
+                    .id(targetId)
+                    .followerCount(1)
+                    .build();
+
+            given(userRepository.findById(targetId)).willReturn(Optional.of(user2));
+            given(userRepository.findById(loginUserId)).willReturn(Optional.of(user1));
+
+            //when
+            userService.unFollowUser(targetId);
+            //then
+            assertThat(user1.getFollowingCount()).isEqualTo(0);
+            assertThat(user2.getFollowerCount()).isEqualTo(0);
+
+            // 리포지토리 삭제 메서드 호출 검증
+            verify(followRepository).deleteByFollower_IdAndFollowing_Id(loginUserId, targetId);
+
+            // 발행된 이벤트 내용이 올바른지 검증
+            verify(publisher).publishEvent(argThat((Object event) -> {
+                if (event instanceof FollowEvent followEvent) {
+                    return followEvent.followerId().equals(loginUserId) &&
+                            followEvent.followingId().equals(targetId) &&
+                            followEvent.actionType() == ActionType.REMOVE;
+                }
+                return false;
+            }));
+        }
+    }
+
     @Test
     @DisplayName("위스키 즐겨찾기 추가 성공 테스트")
     void addWhisky_SUCCESS() throws Exception {
@@ -186,27 +259,60 @@ public class UserServiceTest {
             User user = User.builder().id(loginUserId).build();
             given(userRepository.findById(loginUserId)).willReturn(Optional.of(user));
 
-            WhiskyFavoritesRequest request = new WhiskyFavoritesRequest("whiskyId");
-            given(whiskyServiceClient.getUserFavorites(request.whiskyId())) // 외부 호출 mock 처리
-                    .willReturn(new WhiskyFavoritesResponse("whisky","whiskyId","talisker","image"));
+            String whiskyId = "whiskyId";
+            given(whiskyServiceClient.getUserFavorites(whiskyId)) // 외부 호출 mock 처리
+                    .willReturn(new WhiskyFavoritesResponse("whisky", "whiskyId", "talisker", "image"));
 
             //when
-            userService.addWhiskyFavorites(request);
+            userService.addWhiskyFavorites(whiskyId);
             //then
 
             // 카운트 검증
             assertThat(user.getWhiskyCount()).isEqualTo(1);
             // 저장됐느지 검증
             verify(whiskyRepository).save(argThat(w ->
-                    w.getWhiskyId().equals(request.whiskyId()) &&
+                    w.getWhiskyId().equals(whiskyId) &&
                             w.getUserId().equals(loginUserId)
             ));
             // 이벤트 발행 검증
             verify(publisher).publishEvent(argThat((Object event) -> {
                 if (event instanceof UserWhiskyFavoritesEvent whiskyEvent) {
-                    return whiskyEvent.userId().equals(loginUserId) &&
-                            whiskyEvent.whiskyId().equals(request.whiskyId()) &&
+                    return whiskyEvent.whiskyId().equals(whiskyId) &&
+                            whiskyEvent.userId().equals(loginUserId) &&
                             whiskyEvent.actionType() == ActionType.ADD;
+                }
+                return false;
+            }));
+        }
+    }
+
+    @Test
+    @DisplayName("위스키 즐겨찾기 삭제 성공 테스트")
+    void deleteWhiskyFavorites_SUCCESS() throws Exception {
+
+        try (MockedStatic<SecurityUtil> securityUtil = mockStatic(SecurityUtil.class)) {
+            //given
+            // 사용자 mock
+            String loginUserId = "user1";
+            securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(loginUserId);
+            User user = User.builder().id(loginUserId).whiskyCount(1).build();
+            given(userRepository.findById(loginUserId)).willReturn(Optional.of(user));
+
+            String whiskyId = "whiskyId";
+            WhiskyFavorites whiskyFavorites = WhiskyFavorites.builder().whiskyId(whiskyId).userId(loginUserId).build();
+            given(whiskyRepository.findByUserIdAndWhiskyId(loginUserId, whiskyId)).willReturn(Optional.of(whiskyFavorites));
+            //when
+            userService.deleteWhiskyFavorites(whiskyId);
+            //then
+            verify(whiskyRepository).delete(whiskyFavorites);
+            assertThat(user.getWhiskyCount()).isEqualTo(0);
+
+            // 이벤트 발행 검증
+            verify(publisher).publishEvent(argThat((Object event) -> {
+                if (event instanceof UserWhiskyFavoritesEvent whiskyEvent) {
+                    return whiskyEvent.userId().equals(loginUserId) &&
+                            whiskyEvent.whiskyId().equals(whiskyId) &&
+                            whiskyEvent.actionType() == ActionType.REMOVE;
                 }
                 return false;
             }));

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.whisky.config.BaseTime;
 import org.whisky.domain.dto.WhiskyApiResponse;
 
 @Entity
@@ -16,7 +17,7 @@ import org.whisky.domain.dto.WhiskyApiResponse;
 @Getter
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Whisky {
+public class Whisky extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
