@@ -23,15 +23,13 @@ public class AuthUserService {
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
 
-
     // 회원가입
     public CreateUserResponse signUp(final CreateUserRequest request){
+        validateEmail(request.email());
 
-        if(!validateEmail(request.email())){
-            throw new ConflictException(ErrorMessages.DUPLICATE_EMAIL);
-        }
-        AuthUser authUser = AuthUser.saveUser(request);
-        encodeAndSetPassword(authUser, request.password());
+        String encodedPassword = passwordEncoder.encode(request.password());
+        AuthUser authUser = AuthUser.saveUser(request,encodedPassword);
+
         authUserRepository.save(authUser);
         return AuthUser.toUserDto(authUser);
     }
@@ -42,12 +40,9 @@ public class AuthUserService {
     }
 
     // 이메일 중복 검증
-    private boolean validateEmail(final String email){
-        return !authUserRepository.existsByEmail(email);
-    }
-
-    private void encodeAndSetPassword(AuthUser user, String password) {
-        String encodedPassword = passwordEncoder.encode(password);
-        user.passwordEncode(encodedPassword);
+    private void validateEmail(final String email){
+        if(authUserRepository.existsByEmail(email)){
+            throw new ConflictException(ErrorMessages.DUPLICATE_EMAIL);
+        }
     }
 }
