@@ -3,7 +3,6 @@ package org.board.domain.service;
 import lombok.RequiredArgsConstructor;
 import org.board.domain.dto.request.CreateCommentRequest;
 import org.board.domain.dto.response.CommentResponse;
-import org.board.domain.dto.response.UserResponse;
 import org.board.domain.entity.Comment;
 import org.board.domain.entity.Board;
 import org.board.domain.repository.CommentRepository;
@@ -23,28 +22,26 @@ public class CommentService {
 
     // 해당 질문에 대한 답변 게시
     @Transactional
-    public CommentResponse postAnswer(final CreateCommentRequest request){
+    public CommentResponse postComment(final CreateCommentRequest request) {
         UserPrincipal loginUser = SecurityUtil.getCurrentUser();
 
         Board board = OptionalUtil.getOrElseThrow(boardRepository.findById(request.boardId()), ErrorMessages.POST_NOT_FOUND);
         board.increaseCommentCount();
 
-        Comment comment = Comment.toCommentEntity(request,loginUser);
+        Comment comment = Comment.toCommentEntity(request, loginUser);
         commentRepository.save(comment);
         return CommentResponse.toDto(comment);
     }
 
     // 해당 게시물들의 댓글 조회
     @Transactional(readOnly = true)
-    public List<CommentResponse> getComments(final String boardId){
-        List<Comment> comments = ListUtil.getOrElseThrowList(commentRepository.findByBoardId(boardId),ErrorMessages.COMMENT_NOT_FOUND);
+    public List<CommentResponse> getComments(final String boardId) {
+        List<Comment> comments = ListUtil.getOrElseThrowList(commentRepository.findByBoardId(boardId), ErrorMessages.COMMENT_NOT_FOUND);
         return comments.stream()
                 .map(CommentResponse::toDto)
                 .toList();
 
     }
-
-
 
 
 }

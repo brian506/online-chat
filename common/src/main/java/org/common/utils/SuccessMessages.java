@@ -28,7 +28,7 @@ public final class SuccessMessages {
         public static final String UNFOLLOW_SUCCESS = "언팔로잉 성공";
 
         // comment
-
+        public static final String COMMENT_CREATE_SUCCESS = "댓글 입력 성공";
 
         // whisky
         public static final String WHISKY_ADD_FAVORITES = "위스키 즐겨찾기 등록 성공";

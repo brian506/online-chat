@@ -2,10 +2,13 @@ package org.board.api;
 
 import lombok.RequiredArgsConstructor;
 import org.board.domain.dto.request.CreateBoardRequest;
+import org.board.domain.dto.request.CreateCommentRequest;
 import org.board.domain.dto.response.BoardResponse;
+import org.board.domain.dto.response.CommentResponse;
 import org.board.domain.entity.Tags;
 import org.board.domain.entity.SortType;
 import org.board.domain.service.BoardService;
+import org.board.domain.service.CommentService;
 import org.common.utils.SuccessMessages;
 import org.common.utils.SuccessResponse;
 import org.springframework.data.domain.Slice;
@@ -24,8 +27,15 @@ import java.time.LocalDateTime;
 public class CommentController {
 
     private final BoardService boardService;
+    private final CommentService commentService;
 
-
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> postComment(final CreateCommentRequest request){
+        CommentResponse commentResponse = commentService.postComment(request);
+        SuccessResponse response = new SuccessResponse<>(true,SuccessMessages.COMMENT_CREATE_SUCCESS,commentResponse);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
 
 
 

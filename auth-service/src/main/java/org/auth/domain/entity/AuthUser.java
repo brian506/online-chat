@@ -28,26 +28,21 @@ public class AuthUser extends BaseTime {
     @Column(name = "email", nullable = false, updatable = false)
     private String email;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
     @Column(name = "nickname",nullable = false)
     private String nickname;
-
-    @Column(name = "password", nullable = false, updatable = false)
-    private String password;
 
     @Enumerated(EnumType.STRING)
     @Setter
     @Column(name = "user_role",nullable = false)
     private Role role;
 
-    public void passwordEncode(String encodePassword) {
-        this.password = encodePassword;
-    }
-
-
-    public static AuthUser saveUser(CreateUserRequest request){
+    public static AuthUser saveUser(CreateUserRequest request,String encodedPassword){
         return AuthUser.builder()
                 .email(request.email())
-                .password(request.password())
+                .password(encodedPassword)
                 .nickname(request.nickname())
                 .role(Role.GENERAL)
                 .build();

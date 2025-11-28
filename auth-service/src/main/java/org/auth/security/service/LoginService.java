@@ -38,24 +38,25 @@ public class LoginService {
 
         AuthUser user = OptionalUtil.getOrElseThrow(authUserRepository.findByEmail(loginRequest.email()), ErrorMessages.USER_NOT_FOUND);
 
-        if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
-            throw new AuthenticationException(ErrorMessages.INVALID_CREDENTIALS);
-        }
+        validatePassword(loginRequest,user);
 
         String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(user.getId(), new Date()));
         updateRefreshToken(user,refreshToken);
 
         String accessToken = jwtService.createAccessToken(new AccessTokenPayload(user.getId(), user.getNickname(),Role.GENERAL, new Date()));
-        log.info("저장된 엑세스 토큰 : " + accessToken);
-        // refreshToken 레디스에 저장, 쿠키로 변환은 컨트롤러에서
-        Token token = Token.toEntity(user,refreshToken);
-        tokenRepository.save(token);
-
         return new LoginResponse(Role.GENERAL, accessToken, refreshToken);
     }
 
     private void updateRefreshToken(AuthUser user,String token){
+        // refreshToken 레디스에 저장, 쿠키로 변환은 컨트롤러에서
         tokenRepository.findByRefreshToken(token).ifPresent(tokenRepository::delete);
         tokenRepository.save(Token.toEntity(user, token));
+    }
+
+    private void validatePassword(LoginRequest request,AuthUser user){
+        // 로그인할때도 암호화 과정으로 비교검증
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new AuthenticationException(ErrorMessages.INVALID_CREDENTIALS);
+        }
     }
 }

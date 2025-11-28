@@ -35,8 +35,8 @@ public class UserController {
     @GetMapping("/check-nickname/{nickname}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> duplicateNickname(@PathVariable String nickname){
-        boolean isDuplicated = userService.validateNickname(nickname);
-        SuccessResponse response = new SuccessResponse(true,"닉네임 중복 확인 성공",isDuplicated);
+        userService.validateNickname(nickname);
+        SuccessResponse response = new SuccessResponse(true,"닉네임 중복 확인 성공",null);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
@@ -80,9 +80,18 @@ public class UserController {
     // 위스키 즐겨찾기 추가
     @PostMapping("/whisky-favorites")
     @PreAuthorize(("isAuthenticated()"))
-    public ResponseEntity<?> addWhiskyFavorites(@RequestBody WhiskyFavoritesRequest request){
-        String whiskyId = userService.addWhiskyFavorites(request);
+    public ResponseEntity<?> addWhiskyFavorites(@PathVariable String whiskyId){
+        userService.addWhiskyFavorites(whiskyId);
         SuccessResponse response = new SuccessResponse(true,SuccessMessages.WHISKY_ADD_FAVORITES,whiskyId);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    // 위스키 즐겨찾기 삭제
+    @DeleteMapping("/whisky-favorites")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteWhiskyFavorites(@PathVariable String whiskyId){
+        userService.deleteWhiskyFavorites(whiskyId);
+        SuccessResponse response = new SuccessResponse(true,SuccessMessages.UNFOLLOW_SUCCESS,null);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }
