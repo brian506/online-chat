@@ -24,6 +24,9 @@ public final class ErrorMessages {
     public static final String INTERNAL_SERVER_ERROR = "서버 내부 오류가 발생했습니다.";
     public static final String DATABASE_ERROR = "데이터베이스 처리 중 오류가 발생했습니다.";
 
+    // 위스키 관련
+    public static final String WHISKY_NOT_FOUND = "존재하지 않는 위스키입니다.";
+
 
     // 생성자 private → 인스턴스화 방지
     private ErrorMessages() {}

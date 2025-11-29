@@ -75,7 +75,7 @@ spring:
         - id: whisky
           uri: lb://whisky-service
           predicates:
-            - Path=/v1/api/whisky/**
+            - Path=/v1/api/whiskies/**
 
 
 

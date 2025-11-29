@@ -72,4 +72,13 @@ public class BoardController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 게시물 좋아요 기능
+    @PostMapping("/{boardId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> likeBoard(@PathVariable String boardId){
+        String responseId = boardService.likeBoard(boardId);
+        SuccessResponse response = new SuccessResponse(true,SuccessMessages.LIKE_BOARD_SUCCESS,responseId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

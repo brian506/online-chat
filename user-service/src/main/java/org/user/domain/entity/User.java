@@ -27,13 +27,8 @@ public class User extends BaseTime {
     @Column(name = "user_id",nullable = false,updatable = false)
     private String id; // auth 에서 생성한 userId로 매핑
 
-    // 나의 팔로워
-    @OneToMany(mappedBy = "following",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Follow> followers;
-
-    // 나의 팔로잉( user.getFollowings() X)
-    @OneToMany(mappedBy = "follower",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Follow> followings;
+    @Column(name = "email",nullable = false)
+    private String email;
 
     @Column(name = "nickname",nullable = false)
     private String nickname;
@@ -44,6 +39,14 @@ public class User extends BaseTime {
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    // 나의 팔로워
+    @OneToMany(mappedBy = "following",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Follow> followers;
+
+    // 나의 팔로잉( user.getFollowings() X)
+    @OneToMany(mappedBy = "follower",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Follow> followings;
 
     @Column(name = "level")
     @Enumerated(EnumType.STRING)
@@ -70,6 +73,7 @@ public class User extends BaseTime {
     public static User signUpDtoToEntity(CreateUserRequest request,String userId){
         return User.builder()
                 .id(userId)
+                .email(request.email())
                 .nickname(request.nickname())
                 .birth(request.birth())
                 .gender(request.gender())

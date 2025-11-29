@@ -3,7 +3,7 @@ package org.board.consumer;
 import lombok.RequiredArgsConstructor;
 import org.board.domain.dto.event.FollowEvent;
 import org.board.domain.dto.event.UserFavoritesEvent;
-import org.board.domain.entity.UserBoardFollow;
+import org.board.domain.entity.BoardUserFollow;
 import org.board.domain.entity.UserWhiskyFavorites;
 import org.board.domain.repository.UserBoardFollowRepository;
 import org.board.domain.repository.UserWhiskyFavoritesRepository;
@@ -47,7 +47,7 @@ public class BoardKafkaConsumer {
 
         switch (event.actionType()) {
             case ADD -> { // 팔로잉 추가 이벤트
-                followRepository.save(UserBoardFollow.toEntity(event));
+                followRepository.save(BoardUserFollow.toEntity(event));
                 ack.acknowledge();
             }
             case REMOVE -> { // 팔로잉 해제 이벤트

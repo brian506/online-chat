@@ -28,11 +28,12 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
 
+    // todo 페이징 조회 ID 커버링 인덱스로 최적화
     private final JPAQueryFactory queryFactory;
     private final QBoard board = QBoard.board;
     private final QUserWhiskyFavorites favorites = QUserWhiskyFavorites.userWhiskyFavorites;
     private final QComment comment = QComment.comment1;
-    private final QUserBoardFollow boardFollow = QUserBoardFollow.userBoardFollow;
+    private final QBoardUserFollow boardFollow = QBoardUserFollow.boardUserFollow;
 
     /**
      * 질문 게시글을 WHERE,ORDER BY 동적 조건 생성
@@ -45,8 +46,8 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
                 .selectFrom(board)
                 .join(favorites)
                 .on(
-                        favorites.whiskyId.eq(board.whiskyId)
-                                .and(favorites.userId.eq(userId))
+                        favorites.whiskyId.eq(board.whiskyId) // 즐겨찾기 엔티티의 whiskyId = board의 whiskyId
+                                .and(favorites.userId.eq(userId)) // 사용자의 즐겨찾기 목록 추출
                 )
                 .where(
                         ltCursor(sortType, cursorValue, cursorCreatedAt)

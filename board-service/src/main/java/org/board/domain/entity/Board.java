@@ -15,22 +15,26 @@ import java.util.List;
 @Getter
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "board", indexes = {  // 주제,생성일 복합인덱스
-        @Index(name = "idx_topic_created_at_desc", columnList = "whiskyId, createdAt DESC")
+@Table(name = "boards",indexes = {
+        //todo 운영환경에서 지워야됨
+        // 최신순 정렬 ( whiskyId + createdAt 내림차순)
+        @Index(name = "idx_board_whisky_created",columnList = "whisky_id, created_at DESC"),
+        // 인기순 정렬(whiskyId + commentCount + createdAt 내림차순)
+        @Index(name = "idx_board_whisky_comment",columnList = "whisky_id, comment_count DESC, createdAt DESC"),
+        // 팔로잉 피드용(writerId, createdAt)
+        @Index(name = "idx_board_writer_created", columnList = "writer_id, created_at DESC")
 })
 public class Board extends BaseTime{
 
-    //todo boardtopic,createdAt,id 조건으로 복합인덱스
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "question_id", nullable = false, updatable = false)
+    @Column(name = "board_id", nullable = false, updatable = false)
     private String id;
 
     @Column(name = "whisky_id", nullable = false)
     private String whiskyId;
 
-    // 조회할 때는 post.get() 으로 안하고 CommentRepository 에서 조회 - 양방향 연관관계이지만 단방향 성질 이용
+    // 조회할 때는 board.get() 으로 안하고 CommentRepository 에서 조회 - 양방향 연관관계이지만 단방향 성질 이용
     // 게시물이 삭제될 때만 댓글도 같이 삭제 되게 하기 위해
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
@@ -55,6 +59,9 @@ public class Board extends BaseTime{
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "like_count")
+    private int likeCount;
+
     @Column(name = "comment_count")
     private int commentCount; // 답변 갯수
 
@@ -67,6 +74,15 @@ public class Board extends BaseTime{
 
     public void increaseViewCount(){
         this.viewCount++;
+    }
+
+    public void increaseLikeCount(){
+        this.likeCount++;
+    }
+    public void decreaseLikeCount(){
+        if(this.likeCount > 0){
+            this.likeCount--;
+        }
     }
 
     public static Board toBoardEntity(CreateBoardRequest request, UserPrincipal loginUser){

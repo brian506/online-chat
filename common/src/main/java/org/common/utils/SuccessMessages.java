@@ -13,6 +13,7 @@ public final class SuccessMessages {
         public static final String ANSWER_CREATE_SUCCESS = "답장 생성 완료";
         public static final String ANSWER_DELETE_SUCCESS = "답장 삭제 완료";
         public static final String ANSWER_RETRIEVE_SUCCESS = "답장 단일 조회 완료";
+        public static final String LIKE_BOARD_SUCCESS = "게시판 좋아요 완료";
 
         //User
 
