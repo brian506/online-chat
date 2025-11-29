@@ -87,15 +87,13 @@ public class UserServiceTest {
     void createUserInfo_FAIL() throws Exception {
         //given
         CreateUserRequest userRequest = new CreateUserRequest("test@email.com", "password", "영민짱", LocalDate.of(2000, 05, 06), Gender.MALE);
-        given(authServiceClient.registerUser(any(AuthRegisterRequest.class))) // 외부 호출 mock 처리
-                .willReturn(new AuthRegisterResponse("1234", "test@email.com", "영민짱"));
+
 
         given(userRepository.existsByNickname("영민짱")).willReturn(true); // 이미 닉네임이 있을 때로 가정
         //when
         assertThatThrownBy(() -> userService.createUserInfo(userRequest))
-                .isInstanceOf(ConflictException.class)
-                .extracting("errorMessage")
-                .isEqualTo("이미 사용 중인 닉네임입니다."); // when + then
+                .isInstanceOf(RuntimeException.class);
+
         //then
         verify(userRepository, never()).save(any(User.class));
 

@@ -14,14 +14,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "user_board_follow")
-public class UserBoardFollow extends BaseTime{
+@Table(name = "board_user_follow",indexes = {
+        @Index(name = "idx_board_user_follow",columnList = "followerId, followingId")
+})
+public class BoardUserFollow extends BaseTime{
     /**
      * 팔로잉한 사람들의 게시물 피드 entity
      */
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "user_board_follow_id")
+    @Column(name = "board_user_follow_id")
     private String id;
 
     @Column(name = "follower_id",nullable = false)
@@ -31,8 +33,8 @@ public class UserBoardFollow extends BaseTime{
     private String followingId; // 내가 팔로우하는 사람
 
 
-    public static UserBoardFollow toEntity(FollowEvent event){
-        return UserBoardFollow.builder()
+    public static BoardUserFollow toEntity(FollowEvent event){
+        return BoardUserFollow.builder()
                 .followerId(event.followerId())
                 .followingId(event.followingId())
                 .build();

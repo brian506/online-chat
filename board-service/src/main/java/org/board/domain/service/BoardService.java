@@ -68,8 +68,13 @@ public class BoardService {
         return BoardResponse.from(board,commentResponses);
     }
 
-
-
+    // 좋아요 추가
+    @Transactional
+    public String likeBoard(final String boardId){
+        Board board = OptionalUtil.getOrElseThrow(boardRepository.findById(boardId), ErrorMessages.POST_NOT_FOUND);
+        board.increaseLikeCount();
+        return board.getId();
+    }
 
     // S3 파일 업로드
     private String uploadImage(final MultipartFile image){

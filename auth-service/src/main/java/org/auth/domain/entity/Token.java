@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.time.LocalDateTime;
 
@@ -19,9 +20,10 @@ import java.time.LocalDateTime;
 public class Token  {
 
     @Id
-    private String userId;
-
     private String refreshToken;
+
+    @Indexed
+    private String userId;
 
     private Role role;
 
@@ -29,8 +31,8 @@ public class Token  {
 
     public static Token toEntity(AuthUser user, String token){
         return Token.builder()
-                .userId(user.getId())
                 .refreshToken(token)
+                .userId(user.getId())
                 .role(user.getRole())
                 .createdAt(LocalDateTime.now())
                 .build();

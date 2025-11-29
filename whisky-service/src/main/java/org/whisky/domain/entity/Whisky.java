@@ -8,15 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.whisky.config.BaseTime;
-import org.whisky.domain.dto.WhiskyApiResponse;
 
 @Entity
-@Table(name = "whisky")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Builder
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "whisky")
 public class Whisky extends BaseTime {
 
     @Id
@@ -45,13 +44,4 @@ public class Whisky extends BaseTime {
     @Column(name = "search_keyword")
     private String searchKeyword;
 
-
-    public static Whisky toWhisky(WhiskyApiResponse response){
-        return Whisky.builder()
-                .name(response.getName())
-                .nose(response.getNose())
-                .imageUrl(response.getImageUrl())
-                .metadata(response.getMetadata())
-                .build();
-    }
 }

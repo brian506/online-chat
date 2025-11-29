@@ -1,8 +1,8 @@
 package org.board.domain.repository;
 
-import org.board.domain.entity.UserBoardFollow;
+import org.board.domain.entity.BoardUserFollow;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserBoardFollowRepository extends JpaRepository<UserBoardFollow,String> {
+public interface UserBoardFollowRepository extends JpaRepository<BoardUserFollow,String> {
     void deleteByFollowingIdAndFollowerId(String followingId, String followerId);
 }
