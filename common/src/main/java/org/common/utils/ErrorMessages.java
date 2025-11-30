@@ -27,6 +27,9 @@ public final class ErrorMessages {
     // 위스키 관련
     public static final String WHISKY_NOT_FOUND = "존재하지 않는 위스키입니다.";
 
+    // 알림 관련
+    public static final String NOTIFICATION_NOT_FOUND = "존재하지 않는 알림입니다.";
+
 
     // 생성자 private → 인스턴스화 방지
     private ErrorMessages() {}

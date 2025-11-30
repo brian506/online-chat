@@ -39,12 +39,13 @@ public class BoardController {
     @GetMapping("/favorite-whiskies")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getFavoriteBoards(@RequestParam(name = "sortType", defaultValue = "LATEST") SortType sortType,
-                                       @RequestParam(name = "cursorValue", required = false) Integer cursorValue,
-                                       @RequestParam(name = "cursorCreatedAt", required = false)
-                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorCreatedAt,
-                                       @RequestParam(name = "size", defaultValue = "10") int size
+                                               @RequestParam(name = "cursorValue", required = false) Integer cursorValue,
+                                               @RequestParam(name = "cursorCreatedAt", required = false)
+                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorCreatedAt,
+                                               @RequestParam(required = false) String cursorId,
+                                               @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Slice<BoardResponse> boardResponses = boardService.getFavoritesBoardsByCursor(sortType, cursorValue, cursorCreatedAt, size);
+        Slice<BoardResponse> boardResponses = boardService.getFavoritesBoardsByCursor(sortType, cursorValue, cursorCreatedAt, cursorId,size);
         SuccessResponse response = new SuccessResponse(true, SuccessMessages.ID_POSTS_RETRIEVE_SUCCESS, boardResponses);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -53,12 +54,13 @@ public class BoardController {
     @GetMapping("/followings")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getFollowingBoards(@RequestParam(name = "sortType", defaultValue = "LATEST") SortType sortType,
-                                       @RequestParam(name = "cursorValue", required = false) Integer cursorValue,
-                                       @RequestParam(name = "cursorCreatedAt", required = false)
-                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorCreatedAt,
-                                       @RequestParam(name = "size", defaultValue = "10") int size
+                                                @RequestParam(name = "cursorValue", required = false) Integer cursorValue,
+                                                @RequestParam(name = "cursorCreatedAt", required = false)
+                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorCreatedAt,
+                                                @RequestParam(required = false) String cursorId,
+                                                @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Slice<BoardResponse> boardResponses = boardService.getFollowingBoardsByCursor(sortType, cursorValue, cursorCreatedAt, size);
+        Slice<BoardResponse> boardResponses = boardService.getFollowingBoardsByCursor(sortType, cursorValue, cursorCreatedAt,cursorId, size);
         SuccessResponse response = new SuccessResponse(true, SuccessMessages.ID_POSTS_RETRIEVE_SUCCESS, boardResponses);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -66,7 +68,7 @@ public class BoardController {
     // 게시물 단일 조회
     @GetMapping("/{boardId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getBoard(@PathVariable String boardId){
+    public ResponseEntity<?> getBoard(@PathVariable String boardId) {
         BoardResponse boardResponse = boardService.getBoard(boardId);
         SuccessResponse response = new SuccessResponse(true, SuccessMessages.ID_POSTS_RETRIEVE_SUCCESS, boardResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -75,9 +77,9 @@ public class BoardController {
     // 게시물 좋아요 기능
     @PostMapping("/{boardId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> likeBoard(@PathVariable String boardId){
+    public ResponseEntity<?> likeBoard(@PathVariable String boardId) {
         String responseId = boardService.likeBoard(boardId);
-        SuccessResponse response = new SuccessResponse(true,SuccessMessages.LIKE_BOARD_SUCCESS,responseId);
+        SuccessResponse response = new SuccessResponse(true, SuccessMessages.LIKE_BOARD_SUCCESS, responseId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

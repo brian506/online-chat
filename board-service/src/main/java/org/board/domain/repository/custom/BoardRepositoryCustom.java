@@ -17,7 +17,7 @@ public interface BoardRepositoryCustom {
      * @return
      */
     // 관심등록한 위스키 게시물 조회
-    Slice<BoardResponse> getFavoritesBoardsByCursor(String userId,  SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable);
-    Slice<BoardResponse> getFollowingBoardsByCursor(String userId,  SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable);
+    Slice<BoardResponse> getFavoritesBoardsByCursor(String userId,  SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, String cursorId, Pageable pageable);
+    Slice<BoardResponse> getFollowingBoardsByCursor(String userId,  SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, String cursorId, Pageable pageable);
 }
 

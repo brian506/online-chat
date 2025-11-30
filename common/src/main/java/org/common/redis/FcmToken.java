@@ -1,11 +1,12 @@
 package org.common.redis;
 
-import jakarta.persistence.Id;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.annotation.Id;
 
 @RedisHash(value = "fcm_token")
 @Builder

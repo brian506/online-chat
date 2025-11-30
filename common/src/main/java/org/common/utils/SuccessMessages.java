@@ -35,4 +35,8 @@ public final class SuccessMessages {
         public static final String WHISKY_ADD_FAVORITES = "위스키 즐겨찾기 등록 성공";
         public static final String WHISKY_FAVORITES_RETRIEVE_SUCCESS = "즐겨찾기인 위스키 조회 성공";
         public static final String WHISKY_RETRIEVE_SUCCESS = "위스키 단일 조회 성공";
+
+        // notification
+        public static final String NOTIFICATION_RETRIEVE_SUCCESS = "알림 조회 성공";
+        public static final String NOTIFICATION_DELETE_SUCCESS = "알림 삭제 성공";
 }

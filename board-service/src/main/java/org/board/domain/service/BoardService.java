@@ -43,21 +43,22 @@ public class BoardService {
     }
 
      // 즐겨찾기한 위스키 게시물 불러오기 - cursor
+    // cursorId -> 마지막 게시글의 Id값
     @Transactional(readOnly = true)
     public Slice<BoardResponse> getFavoritesBoardsByCursor(
-             SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, int size) {
+             SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, String cursorId, int size) {
         String userId = SecurityUtil.getCurrentUserId();
         Pageable pageable = PageRequest.of(0,size); // 페이지 번호는 필요없고(0), size 는 프론트에서 결정
-        return boardRepository.getFavoritesBoardsByCursor(userId,sortType,cursorValue,cursorCreatedAt,pageable);
+        return boardRepository.getFavoritesBoardsByCursor(userId,sortType,cursorValue,cursorCreatedAt,cursorId,pageable);
     }
 
     // 팔로잉한 사람의 위스키 게시물 불러오기 - cursor
     @Transactional(readOnly = true)
     public Slice<BoardResponse> getFollowingBoardsByCursor(
-            SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, int size) {
+            SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, String cursorId, int size) {
         String userId = SecurityUtil.getCurrentUserId();
         Pageable pageable = PageRequest.of(0,size); // 페이지 번호는 필요없고(0), size 는 프론트에서 결정
-        return boardRepository.getFollowingBoardsByCursor(userId,sortType,cursorValue,cursorCreatedAt,pageable);
+        return boardRepository.getFollowingBoardsByCursor(userId,sortType,cursorValue,cursorCreatedAt,cursorId,pageable);
     }
 
     // 특정 게시글 조회

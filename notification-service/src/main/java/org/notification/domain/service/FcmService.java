@@ -5,7 +5,6 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.notification.domain.dto.FcmSendRequest;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor

@@ -1,7 +1,7 @@
-package org.board.config;
+package org.notification.config;
 
 import lombok.RequiredArgsConstructor;
-import org.board.security.BoardTokenVerificationFilter;
+import org.notification.security.NotificationTokenVerificationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final BoardTokenVerificationFilter jwtAuthenticationFilter;
+    private final NotificationTokenVerificationFilter jwtAuthenticationFilter;
 
 
     @Bean
@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/v1/api/boards/**").hasAuthority("ROLE_GENERAL")
+                        .requestMatchers("/v1/api/notifications/**").hasAuthority("ROLE_GENERAL")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
