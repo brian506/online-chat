@@ -1,25 +1,25 @@
 package org.user.producer;
 
 import lombok.RequiredArgsConstructor;
+import org.common.event.FollowEvent;
+import org.common.event.UserFavoritesWhiskyEvent;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-import org.user.domain.dto.event.FollowEvent;
-import org.user.domain.dto.event.UserWhiskyFavoritesEvent;
+
 
 @Component
 @RequiredArgsConstructor
-public class KafkaEventListener {
+public class UserEventListener {
 
     /**
      * ApplicationEventPublisher 가 자동으로 리스너 클래스 메서드 실행
      */
-    private final KafkaProducer producer;
+    private final UserKafkaProducer producer;
 
     // 트랜잭션 COMMIT 후 Kafka 발행
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleFavoritesEvent(UserWhiskyFavoritesEvent event){
+    public void handleFavoritesEvent(UserFavoritesWhiskyEvent event){
         producer.sendFavoritesEvent(event);
     }
 

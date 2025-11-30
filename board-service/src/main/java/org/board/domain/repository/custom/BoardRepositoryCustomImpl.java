@@ -76,6 +76,9 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
         return createSliceWithComments(boards, pageable);
     }
 
+    /**
+     * board 에 맞는 comment Slice 처리
+     */
     private Slice<BoardResponse> createSliceWithComments(List<Board> boards,Pageable pageable){
         // 게시글들의 Id 추출
         List<String> boardIds = boards.stream()

@@ -1,20 +1,22 @@
 package org.user.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import org.common.enums.ActionType;
+import org.common.event.FollowEvent;
+import org.common.event.UserFavoritesWhiskyEvent;
 import org.common.exception.custom.ConflictException;
 import org.common.exception.custom.DataNotFoundException;
 import org.common.utils.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.user.domain.dto.event.FollowEvent;
-import org.user.domain.dto.event.UserWhiskyFavoritesEvent;
+
 import org.user.domain.dto.request.AuthRegisterRequest;
 import org.user.domain.dto.request.CreateUserRequest;
 import org.user.domain.dto.request.UserPreferenceRequest;
 import org.user.domain.dto.request.WhiskyFavoritesRequest;
 import org.user.domain.dto.response.*;
-import org.user.domain.entity.ActionType;
+
 import org.user.domain.entity.Follow;
 import org.user.domain.entity.User;
 import org.user.domain.entity.WhiskyFavorites;
@@ -89,7 +91,7 @@ public class UserService {
 
         followRepository.save(follow);
         // kafka event 발행
-        FollowEvent event = FollowEvent.toEvent(loginUserId, targetUser.getId(),ActionType.ADD);
+        FollowEvent event = FollowEvent.toEvent(loginUserId, targetUser.getId(), loginUser.getNickname(),ActionType.ADD);
         publisher.publishEvent(event);
     }
 
@@ -105,7 +107,7 @@ public class UserService {
 
         followRepository.deleteByFollower_IdAndFollowing_Id(loginUserId,userId);
 
-        FollowEvent event = FollowEvent.toEvent(loginUserId,userId,ActionType.REMOVE);
+        FollowEvent event = FollowEvent.toEvent(loginUserId,userId,loginUser.getNickname(),ActionType.REMOVE);
         publisher.publishEvent(event);
     }
 
@@ -123,7 +125,7 @@ public class UserService {
         user.increaseWhiskyCount();
 
         // 이벤트 발행(트랜잭션 COMMIT 후 이벤트 발행)
-        UserWhiskyFavoritesEvent event = UserWhiskyFavoritesEvent.fromResponse(whiskyFavoritesResponse,userId, ActionType.ADD);
+        UserFavoritesWhiskyEvent event = UserFavoritesWhiskyEvent.toEvent(userId, whiskyId,ActionType.ADD);
         publisher.publishEvent(event);
     }
 
@@ -138,7 +140,7 @@ public class UserService {
         whiskyFavoritesRepository.delete(whiskyFavorites);
         user.decreaseWhiskyCount();
 
-        UserWhiskyFavoritesEvent event = UserWhiskyFavoritesEvent.fromRequest(whiskyId,userId,ActionType.REMOVE);
+        UserFavoritesWhiskyEvent event = UserFavoritesWhiskyEvent.toEvent(userId,whiskyId,ActionType.REMOVE);
         publisher.publishEvent(event);
     }
 

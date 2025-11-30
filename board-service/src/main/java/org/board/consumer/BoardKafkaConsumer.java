@@ -1,8 +1,8 @@
 package org.board.consumer;
 
 import lombok.RequiredArgsConstructor;
-import org.board.domain.dto.event.FollowEvent;
-import org.board.domain.dto.event.UserFavoritesEvent;
+import org.common.event.FollowEvent;
+import org.common.event.UserFavoritesWhiskyEvent;
 import org.board.domain.entity.BoardUserFollow;
 import org.board.domain.entity.UserWhiskyFavorites;
 import org.board.domain.repository.UserBoardFollowRepository;
@@ -17,26 +17,6 @@ public class BoardKafkaConsumer {
 
     private final UserWhiskyFavoritesRepository favoritesRepository;
     private final UserBoardFollowRepository followRepository;
-
-    @KafkaListener(
-            topics = "favorites-topic",
-            groupId = "favorites-group",
-            containerFactory = "userFavoritesKafkaListenerContainerFactory"
-    )
-    public void handleFavorites(UserFavoritesEvent event,Acknowledgment ack){
-
-        switch (event.actionType()) {
-            case ADD -> { // 즐겨찾기 추가 이벤트
-                favoritesRepository.save(UserWhiskyFavorites.toEntity(event));
-                ack.acknowledge();
-            }
-            case REMOVE -> { // 즐겨찾기 해제 이벤트
-                favoritesRepository.deleteByUserIdAndWhiskyId(event.userId(), event.whiskyId());
-                ack.acknowledge();
-            }
-        }
-
-    }
 
     @KafkaListener(
             topics = "following-topic",
@@ -55,5 +35,25 @@ public class BoardKafkaConsumer {
                 ack.acknowledge();
             }
         }
+    }
+
+    @KafkaListener(
+            topics = "favorites-topic",
+            groupId = "favorites-group",
+            containerFactory = "userFavoritesKafkaListenerContainerFactory"
+    )
+    public void handleFavorites(UserFavoritesWhiskyEvent event, Acknowledgment ack){
+
+        switch (event.actionType()) {
+            case ADD -> { // 즐겨찾기 추가 이벤트
+                favoritesRepository.save(UserWhiskyFavorites.toEntity(event));
+                ack.acknowledge();
+            }
+            case REMOVE -> { // 즐겨찾기 해제 이벤트
+                favoritesRepository.deleteByUserIdAndWhiskyId(event.userId(), event.whiskyId());
+                ack.acknowledge();
+            }
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-package org.chat.domain.dto.request;
+package org.common.event;
 
 /**
  * 메시지 발행용 dto

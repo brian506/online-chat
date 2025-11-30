@@ -1,16 +1,16 @@
 package org.board.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import org.common.event.LikeEvent;
 import org.board.domain.dto.request.CreateBoardRequest;
 import org.board.domain.dto.response.BoardResponse;
 import org.board.domain.dto.response.CommentResponse;
-import org.board.domain.dto.response.UserResponse;
 import org.board.domain.entity.Board;
-import org.board.domain.entity.Comment;
 import org.board.domain.entity.SortType;
 import org.board.domain.repository.BoardRepository;
 import org.board.utils.FileService;
 import org.common.utils.*;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -28,6 +28,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final FileService fileService;
     private final CommentService commentService;
+    private final ApplicationEventPublisher publisher;
 
     // 위스키 게시글 작성
     @Transactional
@@ -71,8 +72,16 @@ public class BoardService {
     // 좋아요 추가
     @Transactional
     public String likeBoard(final String boardId){
+        UserPrincipal loginUser = SecurityUtil.getCurrentUser();
         Board board = OptionalUtil.getOrElseThrow(boardRepository.findById(boardId), ErrorMessages.POST_NOT_FOUND);
         board.increaseLikeCount();
+
+        LikeEvent likeEvent = new LikeEvent(
+                board.getWriterId(),
+                loginUser.nickname(),
+                boardId
+        );
+        publisher.publishEvent(likeEvent);
         return board.getId();
     }
 

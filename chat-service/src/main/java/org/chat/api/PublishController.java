@@ -3,7 +3,7 @@ package org.chat.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chat.domain.dto.request.CreateReadMessageEvent;
-import org.chat.domain.dto.request.SendMessageEvent;
+import org.common.event.SendMessageEvent;
 import org.chat.domain.service.MessageService;
 import org.chat.domain.service.RoomService;
 import org.springframework.messaging.handler.annotation.MessageMapping;

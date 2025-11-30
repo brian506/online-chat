@@ -1,17 +1,15 @@
 package org.user.producer;
 
 import lombok.RequiredArgsConstructor;
+import org.common.event.FollowEvent;
+import org.common.event.UserFavoritesWhiskyEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.user.domain.dto.event.FollowEvent;
-import org.user.domain.dto.event.UserWhiskyFavoritesEvent;
-import org.user.domain.dto.response.WhiskyFavoritesResponse;
 
 @Service
 @RequiredArgsConstructor
-public class KafkaProducer {
-
+public class UserKafkaProducer {
 
     @Value("${kafka.topic-config.user-favorites.name}")
     private String favoritesTopic;
@@ -21,7 +19,7 @@ public class KafkaProducer {
 
     private final KafkaTemplate<String,Object> kafkaTemplate;
 
-    public void sendFavoritesEvent(UserWhiskyFavoritesEvent event) {
+    public void sendFavoritesEvent(UserFavoritesWhiskyEvent event) {
         kafkaTemplate.send(favoritesTopic,event.userId(),event);
     }
 

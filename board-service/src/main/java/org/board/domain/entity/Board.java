@@ -17,6 +17,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "boards",indexes = {
         //todo 운영환경에서 지워야됨
+
         // 최신순 정렬 ( whiskyId + createdAt 내림차순)
         @Index(name = "idx_board_whisky_created",columnList = "whisky_id, created_at DESC"),
         // 인기순 정렬(whiskyId + commentCount + createdAt 내림차순)

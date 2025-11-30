@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.board.domain.dto.event.FollowEvent;
+import org.common.event.FollowEvent;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
