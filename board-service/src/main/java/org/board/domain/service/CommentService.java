@@ -1,6 +1,7 @@
 package org.board.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import org.common.event.CommentEvent;
 import org.board.domain.dto.request.CreateCommentRequest;
 import org.board.domain.dto.response.CommentResponse;
 import org.board.domain.entity.Comment;
@@ -8,6 +9,7 @@ import org.board.domain.entity.Board;
 import org.board.domain.repository.CommentRepository;
 import org.board.domain.repository.BoardRepository;
 import org.common.utils.*;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ public class CommentService {
 
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final ApplicationEventPublisher publisher;
 
     // 해당 질문에 대한 답변 게시
     @Transactional
@@ -30,6 +33,18 @@ public class CommentService {
 
         Comment comment = Comment.toCommentEntity(request, loginUser);
         commentRepository.save(comment);
+
+        CommentEvent commentEvent = new CommentEvent(
+                comment.getId(),
+                board.getId(),
+                board.getWriterId(),
+                comment.getWriterId(),
+                comment.getWriterNickname(),
+                comment.getComment()
+        );
+
+        publisher.publishEvent(commentEvent);
+
         return CommentResponse.toDto(comment);
     }
 

@@ -1,4 +1,4 @@
-package org.board.domain.entity;
+package org.common.enums;
 
 public enum ActionType {
     ADD, REMOVE

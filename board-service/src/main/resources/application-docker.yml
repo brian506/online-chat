@@ -24,6 +24,41 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_URL}
 
+kafka:
+  admin:
+    properties:
+      bootstrap.servers: kafka:9092
+  topic-config:
+    comment:
+      name: comment-topic
+      partitions: 3
+      replicas: 1
+    like:
+      name: like-topic
+      partitions: 3
+      replicas: 1
+
+  producer:
+    bootstrap-servers: kafka:9092
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    retries: 2
+
+  consumer:
+    following-group:
+      bootstrap-servers: kafka:9092
+      group-id: following-group
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+    favorites-group:
+      bootstrap-servers: kafka:9092
+      group-id: favorites-group
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
 jwt:
   secretKey: ${JWT_KEY}
   access:

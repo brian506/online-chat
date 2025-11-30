@@ -3,9 +3,8 @@ package org.chat.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.chat.domain.dto.request.SendMessageEvent;
+import org.common.event.SendMessageEvent;
 import org.chat.domain.dto.response.MessageBroadcastResponse;
-import org.chat.domain.dto.response.MessageReadResponse;
 import org.chat.domain.dto.response.MessageResponse;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

@@ -40,35 +40,22 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
      * 즐겨찾기 추가한 위스키 피드
      */
     @Override
-    public Slice<BoardResponse> getFavoritesBoardsByCursor(String userId, SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable) {
-        // 게시글 먼저 조회
+    public Slice<BoardResponse> getFavoritesBoardsByCursor(
+            String userId,
+            SortType sortType,
+            Integer cursorValue,
+            LocalDateTime cursorCreatedAt,
+            String cursorId,
+            Pageable pageable
+    ) {
         List<Board> boards = queryFactory
                 .selectFrom(board)
                 .join(favorites)
-                .on(
-                        favorites.whiskyId.eq(board.whiskyId) // 즐겨찾기 엔티티의 whiskyId = board의 whiskyId
-                                .and(favorites.userId.eq(userId)) // 사용자의 즐겨찾기 목록 추출
-                )
+                .on(favorites.whiskyId.eq(board.whiskyId)
+                        .and(favorites.userId.eq(userId)))
                 .where(
-                        ltCursor(sortType, cursorValue, cursorCreatedAt)
+                        ltCursor(sortType, cursorValue, cursorCreatedAt, cursorId) // ★ 수정됨
                 )
-                .orderBy(getOrderSpecifiers(sortType))
-                .limit(pageable.getPageSize() + 1) // 다음 페이지의 게시물이 있는지 확인하기 위함
-                .fetch();
-        return createSliceWithComments(boards,pageable);
-    }
-
-    /**
-     * 팔로잉한 사람들의 위스키 게시물 조회
-     */
-    @Override
-    public Slice<BoardResponse> getFollowingBoardsByCursor(String userId, SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, Pageable pageable) {
-        List<Board> boards = queryFactory
-                .selectFrom(board)
-                .join(boardFollow)
-                .on(boardFollow.followingId.eq(board.writerId) // 팔로잉한 사람(followee)이 쓴 글
-                        .and(boardFollow.followerId.eq(userId))) // 내(follower)가 팔로우한 내역
-                .where(ltCursor(sortType, cursorValue, cursorCreatedAt))
                 .orderBy(getOrderSpecifiers(sortType))
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -76,6 +63,36 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
         return createSliceWithComments(boards, pageable);
     }
 
+    /**
+     * 팔로잉한 사람들의 위스키 게시물 조회
+     */
+    @Override
+    public Slice<BoardResponse> getFollowingBoardsByCursor(
+            String userId,
+            SortType sortType,
+            Integer cursorValue,
+            LocalDateTime cursorCreatedAt,
+            String cursorId,
+            Pageable pageable
+    ) {
+        List<Board> boards = queryFactory
+                .selectFrom(board)
+                .join(boardFollow)
+                .on(boardFollow.followingId.eq(board.writerId)
+                        .and(boardFollow.followerId.eq(userId)))
+                .where(
+                        ltCursor(sortType, cursorValue, cursorCreatedAt, cursorId)
+                )
+                .orderBy(getOrderSpecifiers(sortType))
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        return createSliceWithComments(boards, pageable);
+    }
+
+    /**
+     * board 에 맞는 comment Slice 처리
+     */
     private Slice<BoardResponse> createSliceWithComments(List<Board> boards,Pageable pageable){
         // 게시글들의 Id 추출
         List<String> boardIds = boards.stream()
@@ -113,51 +130,69 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
 
 
     // 정렬 타입에 따른 WHERE 절 결정
-    private BooleanExpression ltCursor(SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt) {
+    private BooleanExpression ltCursor(SortType sortType, Integer cursorValue, LocalDateTime cursorCreatedAt, String cursorId) {
 
-        // 첫 페이지 (커서 없음)
-        if (cursorValue == null && cursorCreatedAt == null) {
+        // 첫 페이지(커서 없음)
+        if (cursorCreatedAt == null || cursorId == null) {
             return null;
         }
 
-        // 커서 존재
         switch (sortType) {
-            // 인기순 - 답변 순(답변 수, 생성일자 내림차순), 좋아요 순?
-            case POPULAR:
-                if (cursorValue == null || cursorCreatedAt == null) return null;
-                return board.commentCount.lt(cursorValue) // 1. 첫번쨰 조건 : commentCount < cursorValue - 답변수가 cursorValue 보다 작은 값들을 더 불러오라
-                        .or(board.commentCount.eq(cursorValue) // 2. 두번째 조건 : commentCount = cursorValue 인 답변수
-                                .and(board.createdAt.lt(cursorCreatedAt))); // 3. 세번째 조건 : 내림차순
-            // 조회순 - (조회수,생성일자 내림차순)
-            case VIEWS:
-                if (cursorValue == null || cursorCreatedAt == null) return null;
+            case POPULAR: // 댓글수(desc) -> 시간(desc) -> ID(asc)
+                return board.commentCount.lt(cursorValue)
+                        .or(board.commentCount.eq(cursorValue)
+                                .and(board.createdAt.lt(cursorCreatedAt)))
+                        .or(board.commentCount.eq(cursorValue)
+                                .and(board.createdAt.eq(cursorCreatedAt))
+                                .and(board.id.gt(cursorId))); // ID는 ASC 정렬이므로 GT(큰값)가 다음 페이지
+
+            case VIEWS: // 조회수(desc) -> 시간(desc) -> ID(asc)
                 return board.viewCount.lt(cursorValue)
                         .or(board.viewCount.eq(cursorValue)
-                                .and(board.createdAt.lt(cursorCreatedAt)));
-            // 오래된 순
-            case OLD:
-                if (cursorCreatedAt == null) return null;
-                else return board.createdAt.gt(cursorCreatedAt);
-                // 최신순 - 기본값
-            case LATEST:
+                                .and(board.createdAt.lt(cursorCreatedAt)))
+                        .or(board.viewCount.eq(cursorValue)
+                                .and(board.createdAt.eq(cursorCreatedAt))
+                                .and(board.id.gt(cursorId)));
+
+            case OLD: // 시간(asc) -> ID(asc) :: 과거 -> 미래
+                return board.createdAt.gt(cursorCreatedAt) // 더 미래의 시간을 가져옴
+                        .or(board.createdAt.eq(cursorCreatedAt)
+                                .and(board.id.gt(cursorId)));
+
+            case LATEST: // 시간(desc) -> ID(asc) :: 미래 -> 과거
             default:
-                if (cursorCreatedAt == null) return null;
-                else return board.createdAt.lt(cursorCreatedAt);
+                return board.createdAt.lt(cursorCreatedAt) // 더 과거의 시간을 가져옴
+                        .or(board.createdAt.eq(cursorCreatedAt)
+                                .and(board.id.gt(cursorId)));
         }
     }
 
     // ORDER BY 절
     private OrderSpecifier<?>[] getOrderSpecifiers(SortType sortType) {
         switch (sortType) {
-            case POPULAR: //todo 조회순,생성일자에 대한 복합인덱스 생성할지?
-                return new OrderSpecifier[]{board.commentCount.desc(), board.createdAt.desc()};
+            case POPULAR:
+                return new OrderSpecifier[]{
+                        board.commentCount.desc(),
+                        board.createdAt.desc(),
+                        board.id.asc() // ★ 필수 추가
+                };
             case VIEWS:
-                return new OrderSpecifier[]{board.viewCount.desc(), board.createdAt.desc()};
+                return new OrderSpecifier[]{
+                        board.viewCount.desc(),
+                        board.createdAt.desc(),
+                        board.id.asc() // ★ 필수 추가
+                };
             case OLD:
-                return new OrderSpecifier[]{board.createdAt.asc()};
+                return new OrderSpecifier[]{
+                        board.createdAt.asc(),
+                        board.id.asc() // ★ 필수 추가
+                };
             case LATEST:
             default:
-                return new OrderSpecifier[]{board.createdAt.desc()};
+                return new OrderSpecifier[]{
+                        board.createdAt.desc(),
+                        board.id.asc() // ★ 필수 추가
+                };
         }
     }
 

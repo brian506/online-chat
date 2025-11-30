@@ -12,6 +12,8 @@ import org.auth.domain.dto.response.AccessTokenPayload;
 import org.auth.domain.dto.response.LoginResponse;
 import org.auth.domain.dto.response.RefreshTokenPayload;
 import org.common.exception.custom.AuthenticationException;
+import org.common.redis.FcmToken;
+import org.common.redis.FcmTokenRepository;
 import org.common.utils.ErrorMessages;
 import org.common.utils.OptionalUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +33,7 @@ public class LoginService {
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FcmTokenRepository fcmTokenRepository;
 
 
     @Transactional
@@ -39,6 +42,10 @@ public class LoginService {
         AuthUser user = OptionalUtil.getOrElseThrow(authUserRepository.findByEmail(loginRequest.email()), ErrorMessages.USER_NOT_FOUND);
 
         validatePassword(loginRequest,user);
+        // Fcm 토큰 db 에 저장
+        if(loginRequest.fcmToken() == null) {
+            fcmTokenRepository.save(new FcmToken(user.getId(), loginRequest.fcmToken()));
+        }
 
         String refreshToken = jwtService.createRefreshToken(new RefreshTokenPayload(user.getId(), new Date()));
         updateRefreshToken(user,refreshToken);

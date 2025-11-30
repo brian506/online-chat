@@ -1,4 +1,4 @@
-package org.user.config;
+package org.chat.config;
 
 import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaProducerConfig {
+public class ChatKafkaProducerConfig {
 
     @Value("${kafka.producer.bootstrap-servers}")
     private String bootstrapServers;

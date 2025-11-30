@@ -25,6 +25,25 @@ eureka:
       defaultZone: ${EUREKA_URL}
 
 kafka:
+  admin:
+    properties:
+      bootstrap.servers: kafka:9092
+  topic-config:
+    comment:
+      name: comment-topic
+      partitions: 3
+      replicas: 1
+    like:
+      name: like-topic
+      partitions: 3
+      replicas: 1
+
+  producer:
+    bootstrap-servers: kafka:9092
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    retries: 2
+
   consumer:
     following-group:
       bootstrap-servers: kafka:9092

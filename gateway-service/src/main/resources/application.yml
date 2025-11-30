@@ -77,6 +77,11 @@ spring:
           predicates:
             - Path=/v1/api/whiskies/**
 
+        - id: notification
+          uri: lb://notification-service
+          predicates:
+            - Path=/v1/api/notifications/**
+
 
 
       discovery:

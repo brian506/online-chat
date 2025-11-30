@@ -2,8 +2,8 @@ package org.board.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.board.domain.dto.event.FollowEvent;
-import org.board.domain.dto.event.UserFavoritesEvent;
+import org.common.event.FollowEvent;
+import org.common.event.UserFavoritesWhiskyEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,8 +54,8 @@ public class BoardKafkaConsumerConfig {
     }
 
     @Bean("userFavoritesConsumerFactory")
-    public ConsumerFactory<String, UserFavoritesEvent> consumerFavoritesFactory() {
-        JsonDeserializer<UserFavoritesEvent> deserializer = new JsonDeserializer<>(UserFavoritesEvent.class);
+    public ConsumerFactory<String, UserFavoritesWhiskyEvent> consumerFavoritesFactory() {
+        JsonDeserializer<UserFavoritesWhiskyEvent> deserializer = new JsonDeserializer<>(UserFavoritesWhiskyEvent.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(true);
@@ -82,8 +82,8 @@ public class BoardKafkaConsumerConfig {
     }
 
     @Bean("userFavoritesKafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, UserFavoritesEvent> favoritesListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, UserFavoritesEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, UserFavoritesWhiskyEvent> favoritesListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, UserFavoritesWhiskyEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFavoritesFactory());
         factory.setConcurrency(3);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);

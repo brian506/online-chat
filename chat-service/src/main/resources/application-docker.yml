@@ -17,6 +17,16 @@ domain:
     publish: /pub
     subscribe: /topic
 
+kafka:
+  admin:
+    properties:
+      bootstrap.servers: kafka:9092
+  topic-config:
+    chatting:
+      name: chatting-topic
+      partitions: 3
+      replicas: 1
+
 jwt:
   secretKey: ${JWT_KEY}
   access:
