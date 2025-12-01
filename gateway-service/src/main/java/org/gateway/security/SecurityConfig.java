@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .pathMatchers("/v1/api/whisky/**").permitAll()
                         .pathMatchers("/ws/**").permitAll()
                         .pathMatchers("/chat-ws/**").permitAll()
+                        .pathMatchers("/v3/api-docs/**").permitAll()
                         // 그 외는 인증
                         .anyExchange().authenticated()
                 )
