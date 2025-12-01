@@ -1,4 +1,4 @@
-package org.auth.config;
+package org.notification.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,10 +11,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@EnableRedisRepositories(basePackages = {
-        "org.common.redis",
-        "org.auth.domain.repository.redis"
-})
+@EnableRedisRepositories(basePackages = "org.common.redis")
 public class RedisConfig {
 
     @Value("${redis.token.host}")

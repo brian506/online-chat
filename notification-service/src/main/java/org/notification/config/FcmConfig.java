@@ -13,7 +13,7 @@ import java.io.IOException;
 @Configuration
 public class FcmConfig {
 
-    @Value("classpath:whisky-firebase-service-account.json")
+    @Value("classpath:firebase/whisky-firebase-service-account.json")
     private Resource googleCredentials;
 
     @Bean

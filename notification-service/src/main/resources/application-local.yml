@@ -53,6 +53,14 @@ kafka:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 
+
+redis:
+  token:
+    host: localhost
+    port: 6379
+    password: ${REDIS_PASSWORD}
+
+
 jwt:
   secretKey: ${JWT_KEY}
   access:

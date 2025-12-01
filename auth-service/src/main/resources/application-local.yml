@@ -17,9 +17,9 @@ spring:
     import: "optional:file:.env.local[.properties]"
 
 redis:
-  refresh-token:
+  token:
     host: localhost
-    port: 6381
+    port: 6379
     password: ${REDIS_PASSWORD}
 
 eureka:
@@ -37,3 +37,4 @@ jwt:
   refresh:
     expiration: 1209600000
     header: Authorization-refresh
+

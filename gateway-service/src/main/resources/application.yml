@@ -41,22 +41,29 @@ spring:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin RETAIN_UNIQUE
 
         - name: AuthenticationFilter
-
+          args:
+            excludedPaths:
+              - /v1/api/auth/login
+              - /v1/api/users/sign-up
+              - /v3/api-docs/**
+              - /swagger-ui
+              - /swagger-ui.html
+              - /swagger-resources
 
       routes:
         - id: user
           uri: lb://user-service
           predicates:
-            - Path=/v1/api/users/**
+            - Path=/v1/api/users/**, /v3/api-docs/user/**
         - id: auth
           uri: lb://auth-service
           predicates:
-            - Path=/v1/api/auth/**
+            - Path=/v1/api/auth/**, /v3/api-docs/auth/**
 
         - id: chat
           uri: lb://chat-service
           predicates:
-            - Path=/v1/api/chat/**
+            - Path=/v1/api/chat/**, /v3/api-docs/chat/**
         - id: chat-ws
           uri: lb://chat-service
           predicates:
@@ -65,7 +72,7 @@ spring:
         - id: board
           uri: lb://board-service
           predicates:
-            - Path=/v1/api/boards/**
+            - Path=/v1/api/boards/**, /v3/api-docs/board/**
 
         - id: comment
           uri: lb://board-service
@@ -75,12 +82,12 @@ spring:
         - id: whisky
           uri: lb://whisky-service
           predicates:
-            - Path=/v1/api/whiskies/**
+            - Path=/v1/api/whiskies/**, /v3/api-docs/whisky/**
 
         - id: notification
           uri: lb://notification-service
           predicates:
-            - Path=/v1/api/notifications/**
+            - Path=/v1/api/notifications/**, /v3/api-docs/notify/**
 
 
 
@@ -98,6 +105,22 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: ${EUREKA_URL}
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: 1. Auth Service      # 드롭다운에 표시될 이름
+        url: /v3/api-docs/auth     # Swagger JSON을 가져올 경로 (아래 라우팅 설명 참고)
+      - name: 2. User Service
+        url: /v3/api-docs/user
+      - name: 3. Board Service
+        url: /v3/api-docs/board
+      - name: 4. Chat Service
+        url: /v3/api-docs/chat
+      - name: 5. Notification Service
+        url: /v3/api-docs/notify
+      - name: 6. Whisky Service
+        url: /v3/api-docs/whisky
 
 jwt:
   secretKey: ${JWT_KEY}
