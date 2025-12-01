@@ -87,7 +87,7 @@ spring:
         - id: notification
           uri: lb://notification-service
           predicates:
-            - Path=/v1/api/notifications/**, /v3/api-docs/notify/**
+            - Path=/v1/api/notifications/**, /v3/api-docs/notifications/**
 
 
 
@@ -118,7 +118,7 @@ springdoc:
       - name: 4. Chat Service
         url: /v3/api-docs/chat
       - name: 5. Notification Service
-        url: /v3/api-docs/notify
+        url: /v3/api-docs/notifications
       - name: 6. Whisky Service
         url: /v3/api-docs/whisky
 

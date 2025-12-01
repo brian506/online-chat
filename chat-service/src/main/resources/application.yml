@@ -14,3 +14,10 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.web.socket: DEBUG
     org.springframework.security: DEBUG
+
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs/chat
+  swagger-ui:
+    path: /swagger-ui.html

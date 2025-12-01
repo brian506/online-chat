@@ -31,3 +31,9 @@ logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs/user
+  swagger-ui:
+    path: /swagger-ui.html
