@@ -63,7 +63,7 @@ public class TokenVerificationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.startsWith("/v3/api-docs");
+        return path.startsWith("/v3/api-docs/**");
     }
 
 

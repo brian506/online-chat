@@ -49,7 +49,7 @@ public class BoardTokenVerificationFilter  extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.startsWith("/v3/api-docs");
+        return path.startsWith("/v3/api-docs/**");
     }
 
     private void setAuthentication(String accessToken) {

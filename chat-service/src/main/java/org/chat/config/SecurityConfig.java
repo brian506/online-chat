@@ -37,7 +37,10 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/chat-ws/**").permitAll()
                         .requestMatchers("/v1/api/chat/**").hasAuthority("ROLE_GENERAL")
-                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenVerificationFilter, UsernamePasswordAuthenticationFilter.class);
