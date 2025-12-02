@@ -2,13 +2,17 @@ package org.chat.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.common.event.SendMessageEvent;
+import org.chat.domain.dto.request.SendMessageRequest;
 import org.chat.domain.dto.response.MessageBroadcastResponse;
 import org.chat.domain.dto.response.MessageListResponse;
 import org.chat.domain.dto.response.MessageResponse;
 import org.chat.domain.entity.Message;
 import org.chat.domain.repository.MessageRepository;
+import org.common.event.MessageEvent;
 import org.common.utils.ListUtil;
+import org.common.utils.SecurityUtil;
+import org.common.utils.UserPrincipal;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +28,24 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final PublishService publishService;
+    private final ApplicationEventPublisher kafkaPublisher;
 
     // 메시지 전송
-    public void createMessage(final SendMessageEvent message,final String senderId){
+    public void createMessage(final SendMessageRequest message,final String senderId,final String senderNickname){
         Message messageToSave = Message.saveMessage(message, senderId);
         Message savedMessage = messageRepository.save(messageToSave);
-        MessageBroadcastResponse response = Message.toBroadCastResponse(savedMessage,senderId);
+        MessageBroadcastResponse response = Message.toBroadCastResponse(savedMessage, senderId);
+        MessageEvent event = new MessageEvent(
+                response.roomId(),
+                message.receiverId(),
+                response.content(),
+                senderId,
+                senderNickname,
+                response.timeStamp()
+        );
+
         publishService.publishMessage(response);
+        kafkaPublisher.publishEvent(event);
     }
 
     // 특정 채팅방에서 메시지들 조회 - list 방식

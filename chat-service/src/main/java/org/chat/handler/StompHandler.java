@@ -14,6 +14,8 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 
 @Slf4j
 @Component
@@ -22,7 +24,7 @@ import org.springframework.stereotype.Component;
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtUtil jwtUtil;
-    private static final String USER_ID_KEY = "stompUserId";
+
 
 
     @Override
@@ -44,7 +46,9 @@ public class StompHandler implements ChannelInterceptor {
             UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
             accessor.setUser(authentication);
             // 다른 프레임에서도 해당 인증 객체를 사용하기 위해 세션에 저장해둠
-            accessor.getSessionAttributes().put(USER_ID_KEY, principal.userId());
+            Map<String, Object> attributes = accessor.getSessionAttributes();
+            attributes.put("userId", principal.userId());
+            attributes.put("nickname", principal.nickname());
 
             accessor.setLeaveMutable(true);
             log.info("✅ STOMP CONNECT 인증 성공: user={}", authentication.getName());

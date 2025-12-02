@@ -3,7 +3,7 @@ package org.chat.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.common.event.SendMessageEvent;
+import org.chat.domain.dto.request.SendMessageRequest;
 import org.chat.domain.dto.response.MessageBroadcastResponse;
 import org.chat.domain.dto.response.MessageResponse;
 import org.springframework.data.annotation.Id;
@@ -33,7 +33,7 @@ public class Message  {
     @Field(name = "timestamp")
     private LocalDateTime timestamp;
 
-    public static Message saveMessage(SendMessageEvent payload, String senderId){
+    public static Message saveMessage(SendMessageRequest payload, String senderId){
        return Message.builder()
                .roomId(payload.roomId())
                .senderId(senderId)

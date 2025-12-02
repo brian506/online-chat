@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.common.event.CommentEvent;
 import org.common.event.FollowEvent;
 import org.common.event.LikeEvent;
+import org.common.event.MessageEvent;
 import org.common.redis.FcmToken;
 import org.common.redis.FcmTokenRepository;
 import org.common.utils.ErrorMessages;
@@ -31,7 +32,7 @@ public class NotifyKafkaConsumer {
             groupId = "following-group",
             containerFactory = "followingKafkaListenerContainerFactory"
     )
-    public void consumeFollowings(FollowEvent event) {
+    public void consumeFollowings(final FollowEvent event) {
         // 팔로잉 당한 사람에게 알림(followingId)
         NotificationMessage message = new NotificationMessage(
                 event.followingId(),
@@ -49,7 +50,7 @@ public class NotifyKafkaConsumer {
             groupId = "comment-group",
             containerFactory = "commentKafkaListenerContainerFactory"
     )
-    public void consumeComment(CommentEvent event) {
+    public void consumeComment(final CommentEvent event) {
         // 게시판 게시자에게 알림
         NotificationMessage message = new NotificationMessage(
                 event.receiverId(),
@@ -67,7 +68,7 @@ public class NotifyKafkaConsumer {
             groupId = "like-group",
             containerFactory = "likeKafkaListenerContainerFactory"
     )
-    public void consumeLike(LikeEvent event) {
+    public void consumeLike(final LikeEvent event) {
         // 게시판 게시자에게 알림
         NotificationMessage message = new NotificationMessage(
                 event.receiverId(),
@@ -80,20 +81,35 @@ public class NotifyKafkaConsumer {
         processNotification(message);
     }
 
-    //todo 채팅 이벤트 알림
+    @KafkaListener(
+            topics = "chatting-topic",
+            groupId = "chatting-group",
+            containerFactory = "chattingKafkaListenerContainerFactory"
+    )
+    public void consumeChat(final MessageEvent event) {
+        // 채팅 상대방에게 알림
+        NotificationMessage message = new NotificationMessage(
+                event.receiverId(),
+                event.senderNickname()+ "님이 메시지를 보냈습니다",
+                 event.content(),
+                "/v1/api/chat/rooms" + event.roomId(),
+                NotificationType.CHATTING
+        );
 
+        processNotification(message);
+    }
 
     /**
      * 중복 메서드 분리
      */
-    private void processNotification(NotificationMessage message) {
+    private void processNotification(final NotificationMessage message) {
         saveNotification(message);
         sendFcm(message);
     }
-    private void saveNotification(NotificationMessage message){
+    private void saveNotification(final NotificationMessage message){
         notificationRepository.save(Notification.toEntity(message));
     }
-    private void sendFcm(NotificationMessage message) {
+    private void sendFcm(final NotificationMessage message) {
         fcmTokenRepository.findById(message.receiverId()).ifPresent(fcmToken -> {
             fcmService.sendNotification(
                     fcmToken.getToken(),

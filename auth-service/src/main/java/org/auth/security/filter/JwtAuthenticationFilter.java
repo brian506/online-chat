@@ -75,12 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
     }
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        return path.startsWith("/v3/api-docs/**")
-                || path.startsWith("/v1/api/auth/login");
-    }
+
 
     // 리프레시 토큰을 이용한 새로운 엑세스 토큰 재발급
     private void refreshTokensAndContinue(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {

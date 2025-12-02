@@ -20,35 +20,34 @@ public class ChatRoomUserRedisService {
     private static final String ROOM_KEY_PREFIX = "chat:room:";
     private static final String SESSION_KEY_PREFIX = "chat:session:";
 
-    private String getRoomKey(String roomId){
+    private String getRoomKey(String roomId) {
         return ROOM_KEY_PREFIX + roomId + ":users";
     }
+
     private String getSessionKey(String sessionId) {
         return SESSION_KEY_PREFIX + sessionId;
     }
 
-    // 사용자 추가
-    public void addUser(String roomId, String nickname,String sessionId){
-        redisTemplate.opsForSet().add(getRoomKey(roomId),nickname);
+    // 사용자 입장
+    public void addUser(String roomId, String userId, String sessionId) {
+        redisTemplate.opsForSet().add(getRoomKey(roomId), userId);
         redisTemplate.opsForValue().set(getSessionKey(sessionId), roomId);
     }
-    // 사용자 제거(세션에서 roomId 찾아서 제거)
-    public String removeUser(String nickname,String sessionId){
+    // 사용자 퇴장
+    public String deleteUser(String sessionId, String userId) {
         String roomId = redisTemplate.opsForValue().get(getSessionKey(sessionId));
-        if (roomId != null) {
-            redisTemplate.opsForSet().remove(getRoomKey(roomId), nickname);
-            redisTemplate.delete(getSessionKey(sessionId));
-        }
+        redisTemplate.opsForSet().remove(getRoomKey(roomId), userId);
+        redisTemplate.delete(getSessionKey(sessionId));
         return roomId;
     }
-    // 방에 있는 모든 사용자 조회
-    public Set<String> getUsers(String roomId){
-        return redisTemplate.opsForSet().members(getRoomKey(roomId));
-    }
-    // 방 비우기
-    public void clearRoom(String roomId,String sessionId){
-        redisTemplate.delete(getRoomKey(roomId));
-        redisTemplate.delete(getSessionKey(sessionId));
+
+    // 사용자 있는 지 확인
+    public boolean isUserConnected(String roomId, String userId) {
+        return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(getRoomKey(roomId), userId));
     }
 
+    // 모든 사용자 조회
+    public Set<String> getUsers(String roomId) {
+        return redisTemplate.opsForSet().members(getRoomKey(roomId));
+    }
 }

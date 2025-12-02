@@ -3,7 +3,7 @@ package org.chat.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chat.domain.dto.request.CreateReadMessageEvent;
-import org.common.event.SendMessageEvent;
+import org.chat.domain.dto.request.SendMessageRequest;
 import org.chat.domain.service.MessageService;
 import org.chat.domain.service.RoomService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,14 +18,16 @@ public class PublishController {
 
     private final MessageService messageService;
     private final RoomService roomService;
-    private static final String USER_ID_KEY = "stompUserId";
+    private static final String USER_ID_KEY = "userId";
+    private static final String USER_NICKNAME = "nickname";
 
     //  "/pub/sendMessage" 경로로 클라이언트가 메시지 보냄
     @MessageMapping("/send/message") // 서버에서 메시지 수신
-    public void sendMessage(@Payload SendMessageEvent event,
+    public void sendMessage(@Payload SendMessageRequest event,
                             StompHeaderAccessor accessor){
         String senderId =(String) accessor.getSessionAttributes().get(USER_ID_KEY);
-        messageService.createMessage(event,senderId);
+        String senderNickname =(String) accessor.getSessionAttributes().get(USER_NICKNAME);
+        messageService.createMessage(event,senderId,senderNickname);
     }
 
     @MessageMapping("/mark/read-message")
