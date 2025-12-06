@@ -8,7 +8,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, String> , UserRepositoryCustom {
-    boolean existsByNickname(String nickname);
-    boolean existsByEmail(String email);
 
 }

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @Builder
-public class Token  {
+public class RefreshToken {
 
     @Id
     private String refreshToken;
@@ -29,8 +29,8 @@ public class Token  {
 
     private LocalDateTime createdAt;
 
-    public static Token toEntity(AuthUser user, String token){
-        return Token.builder()
+    public static RefreshToken toEntity(AuthUser user, String token){
+        return RefreshToken.builder()
                 .refreshToken(token)
                 .userId(user.getId())
                 .role(user.getRole())

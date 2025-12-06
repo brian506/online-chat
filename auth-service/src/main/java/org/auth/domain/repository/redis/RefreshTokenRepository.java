@@ -1,14 +1,14 @@
 package org.auth.domain.repository.redis;
 
-import org.auth.domain.entity.Token;
+import org.auth.domain.entity.RefreshToken;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface TokenRepository extends CrudRepository<Token,String> {
+public interface RefreshTokenRepository extends CrudRepository<RefreshToken,String> {
 
-    Optional<Token> findByRefreshToken(String refreshToken);
+    Optional<RefreshToken> findByRefreshToken(String refreshToken);
     void deleteByUserId(String userId);
 }

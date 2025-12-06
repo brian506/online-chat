@@ -40,17 +40,12 @@ public class UserService {
     // 회원가입
     @Transactional
     public SignUpUserResponse createUserInfo(final CreateUserRequest userRequest){
-
-        validateEmail(userRequest.email());
-        validateNickname(userRequest.nickname());
-
         // Auth-service 로 email,password 가입 요청
         AuthRegisterRequest registerRequest = AuthRegisterRequest.toCreateUser(userRequest);
         AuthRegisterResponse registerResponse = authService.registerUser(registerRequest);
 
         User user = User.signUpDtoToEntity(userRequest,registerResponse.userId());
         userRepository.save(user);
-
         return SignUpUserResponse.requestToResponse(userRequest, registerResponse.userId());
     }
 
@@ -151,21 +146,6 @@ public class UserService {
     public void deleteUser(final String userId){
         User user = OptionalUtil.getOrElseThrow(userRepository.findById(userId),"존재하지 않은 사용자입니다.");
         userRepository.delete(user);
-    }
-
-
-    // 닉네임 중복 확인
-    public void validateNickname(final String nickname){
-        if (userRepository.existsByNickname(nickname)) {
-            throw new ConflictException("이미 사용 중인 닉네임입니다.");
-        }
-    }
-
-    // 이메일 중복 확인
-    public void validateEmail(final String email){
-        if (userRepository.existsByEmail(email)) {
-            throw new ConflictException("이미 사용 중인 이메일입니다.");
-        }
     }
 
 

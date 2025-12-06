@@ -64,8 +64,8 @@ public class NotifyKafkaConsumerConfig {
     }
 
     @Bean("chattingKafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, SendMessageEvent> chattingListenerContainerFactory() {
-        return createContainerFactory(SendMessageEvent.class, chattingGroupId);
+    public ConcurrentKafkaListenerContainerFactory<String, MessageEvent> chattingListenerContainerFactory() {
+        return createContainerFactory(MessageEvent.class, chattingGroupId);
     }
 
     @Bean("followingKafkaListenerContainerFactory")

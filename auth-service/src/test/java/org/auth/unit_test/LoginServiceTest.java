@@ -7,11 +7,11 @@
 //import org.auth.domain.dto.response.RefreshTokenPayload;
 //import org.auth.domain.entity.AuthUser;
 //import org.auth.domain.entity.Role;
-//import org.auth.domain.entity.Token;
+//import org.auth.domain.entity.RefreshToken;
 //import org.auth.domain.repository.AuthUserRepository;
 //import org.auth.domain.repository.redis.TokenRepository;
 //import org.auth.security.service.JwtService;
-//import org.auth.security.service.LoginService;
+//import org.auth.domain.service.LoginService;
 //import org.common.exception.custom.AuthenticationException;
 //import org.common.utils.ErrorMessages;
 //import org.junit.jupiter.api.DisplayName;
@@ -72,7 +72,7 @@
 //        Assertions.assertThat(loginResponse.refreshToken()).isEqualTo("refreshToken");
 //
 //        // 토큰리포지토리가 한번이라도 호출됐는지 검증
-//        verify(tokenRepository,times(1)).save(any(Token.class));
+//        verify(tokenRepository,times(1)).save(any(RefreshToken.class));
 //
 //    }
 //    @Test

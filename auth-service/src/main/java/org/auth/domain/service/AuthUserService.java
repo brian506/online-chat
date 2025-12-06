@@ -6,7 +6,7 @@ import org.auth.domain.dto.request.CreateUserRequest;
 import org.auth.domain.dto.response.CreateUserResponse;
 import org.auth.domain.entity.AuthUser;
 import org.auth.domain.repository.AuthUserRepository;
-import org.auth.domain.repository.redis.TokenRepository;
+import org.auth.domain.repository.redis.RefreshTokenRepository;
 import org.common.exception.custom.ConflictException;
 import org.common.utils.ErrorMessages;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,13 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthUserService {
 
     private final AuthUserRepository authUserRepository;
-    private final TokenRepository tokenRepository;
+    private final RefreshTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
 
     // 회원가입
     public CreateUserResponse signUp(final CreateUserRequest request){
         validateEmail(request.email());
-
+        validateNickname(request.nickname());
         String encodedPassword = passwordEncoder.encode(request.password());
         AuthUser authUser = AuthUser.saveUser(request,encodedPassword);
 
@@ -43,6 +43,12 @@ public class AuthUserService {
     private void validateEmail(final String email){
         if(authUserRepository.existsByEmail(email)){
             throw new ConflictException(ErrorMessages.DUPLICATE_EMAIL);
+        }
+    }
+    // 닉네임 중복 확인
+    public void validateNickname(final String nickname){
+        if (authUserRepository.existsByNickname(nickname)) {
+            throw new ConflictException(ErrorMessages.DUPLICATE_NICKNAME);
         }
     }
 }

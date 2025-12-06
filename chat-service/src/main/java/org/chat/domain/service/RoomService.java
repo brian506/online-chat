@@ -27,12 +27,13 @@ public class RoomService {
     private final MessageRepository messageRepository;
     private final PublishService publishService;
     private final UserServiceClient userServiceClient;
+    private final ChatRoomUserRedisService chatRoomUserRedisService;
 
+    @Transactional
     public RoomUserResponse createPrivateRoom(final String userId) {
         // 나와 상대 정보
         UserPrincipal loginUser = SecurityUtil.getCurrentUser();
         String roomKey = Room.generateRoomKey(loginUser.userId(),userId);
-
 
         Room room = findOrCreateRoom(loginUser,userId,roomKey);
         // 채팅방에서 보이는 닉네임(유저에 따라 다름)
