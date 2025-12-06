@@ -23,7 +23,7 @@ public class Whisky extends BaseTime {
     @Column(name = "whisky_id", nullable = false, updatable = false)
     private String id;
 
-     @Column(name = "name")
+    @Column(name = "name")
     private String name;
 
     @Column(name = "nose",columnDefinition = "TEXT")

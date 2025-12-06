@@ -12,8 +12,6 @@ public class ChatRoomUserRedisService {
 
     /**
      * 방에 참여자 목록 위한 레디스
-     * 서버가 여러개 일때를 고려하여 sessionId 도 레디스에서 관리
-     * 추후에 단체방에서 사용
      */
 
     private final StringRedisTemplate redisTemplate;

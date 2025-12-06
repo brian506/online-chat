@@ -31,15 +31,6 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // 사용자 별명 중복 확인
-    @GetMapping("/check-nickname/{nickname}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> duplicateNickname(@PathVariable String nickname){
-        userService.validateNickname(nickname);
-        SuccessResponse response = new SuccessResponse(true,"닉네임 중복 확인 성공",null);
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-
     // 선호도 조사
     //todo 응답 dto 로 굳이?
     @PatchMapping("/preferences")

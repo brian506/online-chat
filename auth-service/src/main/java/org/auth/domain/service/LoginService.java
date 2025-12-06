@@ -1,16 +1,17 @@
-package org.auth.security.service;
+package org.auth.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.auth.domain.dto.request.LoginRequest;
 import org.auth.domain.entity.Role;
-import org.auth.domain.entity.Token;
+import org.auth.domain.entity.RefreshToken;
 import org.auth.domain.entity.AuthUser;
-import org.auth.domain.repository.redis.TokenRepository;
+import org.auth.domain.repository.redis.RefreshTokenRepository;
 import org.auth.domain.repository.AuthUserRepository;
 import org.auth.domain.dto.response.AccessTokenPayload;
 import org.auth.domain.dto.response.LoginResponse;
 import org.auth.domain.dto.response.RefreshTokenPayload;
+import org.auth.security.service.JwtService;
 import org.common.exception.custom.AuthenticationException;
 import org.common.redis.FcmToken;
 import org.common.redis.FcmTokenRepository;
@@ -20,8 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -31,7 +30,7 @@ public class LoginService {
 
     private final AuthUserRepository authUserRepository;
     private final JwtService jwtService;
-    private final TokenRepository tokenRepository;
+    private final RefreshTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final FcmTokenRepository fcmTokenRepository;
 
@@ -43,7 +42,7 @@ public class LoginService {
 
         validatePassword(loginRequest,user);
         // Fcm 토큰 db 에 저장
-        if(loginRequest.fcmToken() == null) {
+        if(loginRequest.fcmToken() != null) {
             fcmTokenRepository.save(new FcmToken(user.getId(), loginRequest.fcmToken()));
         }
 
@@ -57,7 +56,7 @@ public class LoginService {
     private void updateRefreshToken(AuthUser user,String token){
         // refreshToken 레디스에 저장, 쿠키로 변환은 컨트롤러에서
         tokenRepository.findByRefreshToken(token).ifPresent(tokenRepository::delete);
-        tokenRepository.save(Token.toEntity(user, token));
+        tokenRepository.save(RefreshToken.toEntity(user, token));
     }
 
     private void validatePassword(LoginRequest request,AuthUser user){

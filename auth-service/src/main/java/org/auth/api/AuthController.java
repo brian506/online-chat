@@ -8,7 +8,7 @@ import org.auth.domain.dto.response.CreateUserResponse;
 import org.auth.domain.dto.response.LoginResponse;
 import org.auth.domain.service.AuthUserService;
 import org.auth.security.service.CookieService;
-import org.auth.security.service.LoginService;
+import org.auth.domain.service.LoginService;
 
 import org.common.utils.SuccessMessages;
 import org.common.utils.SuccessResponse;
@@ -43,6 +43,15 @@ public class AuthController {
                 .header(HttpHeaders.AUTHORIZATION,loginResponse.accessToken())
                 .header(HttpHeaders.SET_COOKIE,refreshTokenCookie)
                 .body(new SuccessResponse(true,"로그인 성공",loginResponse));
+    }
+
+    // 사용자 별명 중복 확인
+    @GetMapping("/check-nickname/{nickname}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> duplicateNickname(@PathVariable String nickname){
+        userService.validateNickname(nickname);
+        SuccessResponse response = new SuccessResponse(true,"닉네임 중복 확인 성공",null);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
     @PostMapping("/logout/{userId}")

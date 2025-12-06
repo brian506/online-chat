@@ -37,9 +37,6 @@ public class WhiskyService {
 
     // 카테고리별 조회
 
-    @CacheEvict(value = "whisky", key = "#whiskyId")
-    @Transactional
-    public void deleteWhisky(String whiskyId) {
-        whiskyRepository.deleteById(whiskyId);
-    }
+
+
 }

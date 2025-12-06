@@ -1,4 +1,4 @@
-package org.notification.domain.consumer;
+package org.notification.consumer;
 
 
 import lombok.RequiredArgsConstructor;
